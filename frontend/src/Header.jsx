@@ -232,19 +232,22 @@ function Header({ onSearch, allProducts = [] }) {
                     <span className="hidden lg:inline">{user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+                  <DropdownMenuLabel className="text-card-foreground">Tài khoản của tôi</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-border" />
+                  <DropdownMenuItem className="text-card-foreground hover:bg-accent cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     Thông tin cá nhân
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="text-card-foreground hover:bg-accent cursor-pointer">
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     Đơn hàng của tôi
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} className="text-red-500">
+                  <DropdownMenuSeparator className="bg-border" />
+                  <DropdownMenuItem 
+                    onClick={logout} 
+                    className="text-red-500 hover:bg-red-500/10 hover:text-red-600 cursor-pointer"
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Đăng xuất
                   </DropdownMenuItem>

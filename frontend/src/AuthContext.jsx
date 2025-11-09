@@ -1,46 +1,111 @@
 // src/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
+const BACKEND_URL = 'http://localhost:5000';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState(null);
 
-  // Load user từ localStorage khi app khởi động
+  // Load token và user từ localStorage khi app khởi động
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('user');
+    const loadUser = async () => {
+      const savedToken = localStorage.getItem('token');
+      
+      if (savedToken) {
+        try {
+          // Verify token với backend
+          const response = await axios.get(`${BACKEND_URL}/api/auth/me`, {
+            headers: {
+              Authorization: `Bearer ${savedToken}`
+            }
+          });
+          
+          if (response.data.success) {
+            setUser(response.data.user);
+            setToken(savedToken);
+          } else {
+            // Token không hợp lệ, xóa đi
+            localStorage.removeItem('token');
+          }
+        } catch (error) {
+          console.error('Error loading user:', error);
+          localStorage.removeItem('token');
+        }
       }
-    }
-    setIsLoading(false);
+      
+      setIsLoading(false);
+    };
+
+    loadUser();
   }, []);
 
   // Hàm đăng nhập
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
+        email,
+        password
+      });
+
+      if (response.data.success) {
+        const { user, token } = response.data;
+        
+        // Lưu vào state
+        setUser(user);
+        setToken(token);
+        
+        // Lưu token vào localStorage
+        localStorage.setItem('token', token);
+        
+        return { success: true };
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Đăng nhập thất bại';
+      return { success: false, error: errorMessage };
+    }
   };
 
   // Hàm đăng xuất
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    setToken(null);
+    localStorage.removeItem('token');
   };
 
   // Hàm đăng ký
-  const register = (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const register = async (name, email, password) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/register`, {
+        name,
+        email,
+        password
+      });
+
+      if (response.data.success) {
+        const { user, token } = response.data;
+        
+        // Lưu vào state
+        setUser(user);
+        setToken(token);
+        
+        // Lưu token vào localStorage
+        localStorage.setItem('token', token);
+        
+        return { success: true };
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Đăng ký thất bại';
+      return { success: false, error: errorMessage };
+    }
   };
 
   const value = {
     user,
+    token,
     isLoading,
     isAuthenticated: !!user,
     login,

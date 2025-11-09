@@ -35,7 +35,7 @@ function LoginDialog({ isOpen, onClose }) {
     confirmPassword: ''
   });
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
@@ -47,20 +47,24 @@ function LoginDialog({ isOpen, onClose }) {
       return;
     }
 
-    // Mock successful login
-    setTimeout(() => {
-      login({
-        id: '1',
-        name: 'Người dùng',
-        email: loginForm.email
-      });
+    try {
+      const result = await login(loginForm.email, loginForm.password);
+      
+      if (result.success) {
+        setIsLoading(false);
+        onClose();
+        setLoginForm({ email: '', password: '' });
+      } else {
+        setError(result.error);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError('Đã xảy ra lỗi, vui lòng thử lại');
       setIsLoading(false);
-      onClose();
-      setLoginForm({ email: '', password: '' });
-    }, 1000);
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
@@ -84,17 +88,25 @@ function LoginDialog({ isOpen, onClose }) {
       return;
     }
 
-    // Mock successful register
-    setTimeout(() => {
-      register({
-        id: '1',
-        name: registerForm.name,
-        email: registerForm.email
-      });
+    try {
+      const result = await register(
+        registerForm.name,
+        registerForm.email,
+        registerForm.password
+      );
+      
+      if (result.success) {
+        setIsLoading(false);
+        onClose();
+        setRegisterForm({ name: '', email: '', password: '', confirmPassword: '' });
+      } else {
+        setError(result.error);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError('Đã xảy ra lỗi, vui lòng thử lại');
       setIsLoading(false);
-      onClose();
-      setRegisterForm({ name: '', email: '', password: '', confirmPassword: '' });
-    }, 1000);
+    }
   };
 
   return (
@@ -179,7 +191,7 @@ function LoginDialog({ isOpen, onClose }) {
                   <Input
                     id="register-name"
                     type="text"
-                    placeholder="Nguyễn Văn A"
+                    placeholder="Tên của bạn là gì?"
                     value={registerForm.name}
                     onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
                     className="pl-10"

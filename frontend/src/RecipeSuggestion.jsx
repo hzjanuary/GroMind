@@ -133,7 +133,7 @@ function RecipeSuggestion({ allProducts }) {
       <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
         <CardTitle className="flex items-center">
           <Wand2 className="mr-2 h-6 w-6" />
-          Gợi ý món ngon
+          Gợi ý món ngon (AI Assistant)
         </CardTitle>
       </CardHeader>
       

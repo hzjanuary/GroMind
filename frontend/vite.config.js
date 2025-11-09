@@ -1,5 +1,4 @@
 // vite.config.js
-
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite' // <-- Đảm bảo có dòng này
@@ -11,7 +10,12 @@ export default defineConfig({
     react(),
     tailwindcss(), // <-- Đảm bảo có dòng này
   ],
-  
+
+  server: {
+    allowedHosts: [
+    ]
+    
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"), // <-- Đảm bảo có alias này

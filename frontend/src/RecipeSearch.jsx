@@ -163,7 +163,7 @@ function RecipeSearch({ allProducts }) {
       <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
         <CardTitle className="flex items-center">
           <ChefHat className="mr-2 h-6 w-6" />
-          Tìm công thức món ăn (Bằng AI)
+          Tìm công thức món ăn (AI Assistant)
         </CardTitle>
       </CardHeader>
 
