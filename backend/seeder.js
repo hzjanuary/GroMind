@@ -52,7 +52,7 @@ const importData = async () => {
     // 5. Thêm sản phẩm vào DB
     await Product.insertMany(productsToInsert);
     console.log('Đã thêm sản phẩm...');
-
+    
     console.log('=============================');
     console.log('GIEO MẦM DỮ LIỆU THÀNH CÔNG!');
     console.log('=============================');
