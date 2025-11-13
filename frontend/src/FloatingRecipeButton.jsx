@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { ChefHat } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { ChefHat } from 'lucide-react';
 
 function FloatingRecipeButton() {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,13 +26,13 @@ function FloatingRecipeButton() {
     if (recipesSection) {
       // Bật hiệu ứng
       setIsScrolling(true);
-      
+
       // Scroll với animation mượt
-      recipesSection.scrollIntoView({ 
+      recipesSection.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'start',
       });
-      
+
       // Tắt hiệu ứng sau khi scroll xong (1 giây)
       setTimeout(() => {
         setIsScrolling(false);
@@ -45,7 +45,9 @@ function FloatingRecipeButton() {
       {/* Floating Button */}
       <div
         className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
+          isVisible
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-20 opacity-0 pointer-events-none'
         }`}
       >
         <Button
@@ -57,17 +59,19 @@ function FloatingRecipeButton() {
         >
           {/* Animated gradient background */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] animate-gradient"></div>
-          
+
           {/* Content */}
           <div className="relative flex items-center gap-3">
-            <ChefHat className={`h-5 w-5 transition-transform duration-300 ${
-              isScrolling ? 'animate-wiggle' : 'group-hover:animate-bounce'
-            }`} />
+            <ChefHat
+              className={`h-5 w-5 transition-transform duration-300 ${
+                isScrolling ? 'animate-wiggle' : 'group-hover:animate-bounce'
+              }`}
+            />
             <span className="font-semibold whitespace-nowrap">
               Bạn chưa biết ăn gì?
             </span>
           </div>
-          
+
           {/* Ripple effect khi click */}
           {isScrolling && (
             <span className="absolute inset-0 animate-ping-slow bg-primary/30 rounded-full"></span>

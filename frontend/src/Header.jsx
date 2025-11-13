@@ -3,10 +3,28 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useCart } from './CartContext.jsx';
 import { useAuth } from './AuthContext.jsx'; // <- THÊM MỚI
 import LoginDialog from './LoginDialog.jsx'; // <- THÊM MỚI
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
-import { ShoppingBag, LogIn, LogOut, Trash2, Search, X, TrendingUp, User } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetClose,
+} from '@/components/ui/sheet';
+import { useNavigate } from 'react-router-dom';
+import {
+  ShoppingBag,
+  LogIn,
+  LogOut,
+  Trash2,
+  Search,
+  X,
+  TrendingUp,
+  User,
+} from 'lucide-react';
 import ThemeToggle from './ThemeToggle.jsx';
 import {
   AlertDialog,
@@ -18,7 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,12 +44,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 // Component CartItem (dùng bên trong Sheet)
 function CartItem({ item, onDecrease, onIncrease }) {
   return (
-    <div className="flex items-center justify-between py-4 border-b border-primary-foreground/20"> 
+    <div className="flex items-center justify-between py-4 border-b border-primary-foreground/20">
       <div>
         <p className="font-semibold">{item.name}</p>
         <p className="text-sm text-primary-foreground/80">
@@ -39,9 +57,23 @@ function CartItem({ item, onDecrease, onIncrease }) {
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDecrease}>-</Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={onDecrease}
+        >
+          -
+        </Button>
         <span className="w-5 text-center">{item.quantity}</span>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onIncrease}>+</Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={onIncrease}
+        >
+          +
+        </Button>
       </div>
     </div>
   );
@@ -49,8 +81,22 @@ function CartItem({ item, onDecrease, onIncrease }) {
 
 // Component Header chính
 function Header({ onSearch, allProducts = [] }) {
-  const { cartItems, itemCount, totalAmount, decreaseQuantity, addToCart, clearCart } = useCart();
+  const {
+    cartItems,
+    itemCount,
+    totalAmount,
+    decreaseQuantity,
+    addToCart,
+    clearCart,
+  } = useCart();
   const { user, isAuthenticated, logout } = useAuth(); // <- THÊM MỚI
+  const navigate = useNavigate();
+  const goToAccount = React.useCallback(() => navigate('/account'), [navigate]);
+  const goToOrders = React.useCallback(() => navigate('/orders'), [navigate]);
+  const goToCheckout = React.useCallback(
+    () => navigate('/checkout'),
+    [navigate],
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -74,8 +120,8 @@ function Header({ onSearch, allProducts = [] }) {
   useEffect(() => {
     if (searchTerm.trim() && allProducts.length > 0) {
       const filtered = allProducts
-        .filter(product => 
-          product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        .filter((product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()),
         )
         .slice(0, 5); // Chỉ hiển thị 5 kết quả
       setFilteredSuggestions(filtered);
@@ -117,12 +163,16 @@ function Header({ onSearch, allProducts = [] }) {
   // Highlight matching text
   const highlightMatch = (text, query) => {
     if (!query.trim()) return text;
-    
+
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
-    return parts.map((part, index) => 
-      part.toLowerCase() === query.toLowerCase() 
-        ? <strong key={index} className="text-accent font-bold">{part}</strong>
-        : part
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <strong key={index} className="text-accent font-bold">
+          {part}
+        </strong>
+      ) : (
+        part
+      ),
     );
   };
 
@@ -132,15 +182,15 @@ function Header({ onSearch, allProducts = [] }) {
         {/* Main Header Row */}
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <a 
-            href="/" 
+          <a
+            href="/"
             className="text-2xl font-bold transition-transform hover:scale-105 cursor-pointer flex-shrink-0"
           >
             GroMind
           </a>
 
           {/* Desktop Search Bar */}
-          <form 
+          <form
             onSubmit={handleSearch}
             className="hidden md:flex items-center flex-1 max-w-md mx-8"
             ref={searchRef}
@@ -194,7 +244,8 @@ function Header({ onSearch, allProducts = [] }) {
                             {highlightMatch(product.name, searchTerm)}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {product.price.toLocaleString('vi-VN')}đ / {product.unit}
+                            {product.price.toLocaleString('vi-VN')}đ /{' '}
+                            {product.unit}
                           </p>
                         </div>
                         <TrendingUp className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -212,8 +263,8 @@ function Header({ onSearch, allProducts = [] }) {
           {/* Action Buttons */}
           <div className="flex items-center gap-2 md:gap-4">
             {/* Mobile Search Toggle */}
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="md:hidden hover:bg-primary/80"
               onClick={() => setIsSearchExpanded(!isSearchExpanded)}
@@ -222,7 +273,7 @@ function Header({ onSearch, allProducts = [] }) {
             </Button>
 
             <ThemeToggle />
-            
+
             {/* Login/User Menu */}
             {isAuthenticated ? (
               <DropdownMenu>
@@ -232,20 +283,31 @@ function Header({ onSearch, allProducts = [] }) {
                     <span className="hidden lg:inline">{user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-card border-border">
-                  <DropdownMenuLabel className="text-card-foreground">Tài khoản của tôi</DropdownMenuLabel>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border"
+                >
+                  <DropdownMenuLabel className="text-card-foreground">
+                    Tài khoản của tôi
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem className="text-card-foreground hover:bg-accent cursor-pointer">
+                  <DropdownMenuItem
+                    className="text-card-foreground hover:bg-accent cursor-pointer"
+                    onClick={goToAccount}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     Thông tin cá nhân
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-card-foreground hover:bg-accent cursor-pointer">
+                  <DropdownMenuItem
+                    className="text-card-foreground hover:bg-accent cursor-pointer"
+                    onClick={goToOrders}
+                  >
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     Đơn hàng của tôi
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem 
-                    onClick={logout} 
+                  <DropdownMenuItem
+                    onClick={logout}
                     className="text-red-500 hover:bg-red-500/10 hover:text-red-600 cursor-pointer"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -254,8 +316,8 @@ function Header({ onSearch, allProducts = [] }) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="hidden sm:flex hover:bg-primary/80 cursor-pointer"
                 onClick={() => setShowLoginDialog(true)}
               >
@@ -266,7 +328,10 @@ function Header({ onSearch, allProducts = [] }) {
 
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" className="relative hover:bg-primary/80 cursor-pointer">
+                <Button
+                  variant="ghost"
+                  className="relative hover:bg-primary/80 cursor-pointer"
+                >
                   <ShoppingBag className="h-6 w-6" />
                   {itemCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -275,17 +340,17 @@ function Header({ onSearch, allProducts = [] }) {
                   )}
                 </Button>
               </SheetTrigger>
-              
+
               <SheetContent className="flex flex-col bg-primary text-primary-foreground border-l-0">
                 <SheetHeader>
                   <SheetTitle className="flex items-center justify-between">
                     <span>Giỏ hàng của bạn ({itemCount})</span>
-                    
+
                     {cartItems.length > 0 && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="icon"
                             className="h-8 w-8 hover:bg-red-500/20 hover:text-red-300"
                           >
@@ -294,15 +359,17 @@ function Header({ onSearch, allProducts = [] }) {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Xóa tất cả sản phẩm?</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              Xóa tất cả sản phẩm?
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Hành động này sẽ xóa tất cả {itemCount} sản phẩm trong giỏ hàng. 
-                              Bạn có chắc chắn muốn tiếp tục?
+                              Hành động này sẽ xóa tất cả {itemCount} sản phẩm
+                              trong giỏ hàng. Bạn có chắc chắn muốn tiếp tục?
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Hủy</AlertDialogCancel>
-                            <AlertDialogAction 
+                            <AlertDialogAction
                               onClick={clearCart}
                               className="bg-red-500 hover:bg-red-600"
                             >
@@ -314,7 +381,7 @@ function Header({ onSearch, allProducts = [] }) {
                     )}
                   </SheetTitle>
                 </SheetHeader>
-                
+
                 <div className="flex-1 overflow-y-auto">
                   {cartItems.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-primary-foreground/60">
@@ -322,8 +389,8 @@ function Header({ onSearch, allProducts = [] }) {
                       <p>Giỏ hàng đang trống.</p>
                     </div>
                   ) : (
-                    cartItems.map(item => (
-                      <CartItem 
+                    cartItems.map((item) => (
+                      <CartItem
                         key={item._id}
                         item={item}
                         onDecrease={() => decreaseQuantity(item._id)}
@@ -332,17 +399,25 @@ function Header({ onSearch, allProducts = [] }) {
                     ))
                   )}
                 </div>
-                
+
                 {cartItems.length > 0 && (
                   <SheetFooter className="mt-auto border-t border-primary-foreground/20 pt-4">
                     <div className="w-full space-y-4">
                       <div className="flex justify-between font-bold text-lg">
                         <span>Tổng cộng:</span>
-                        <span className="text-accent">{totalAmount.toLocaleString('vi-VN')}đ</span>
+                        <span className="text-accent">
+                          {totalAmount.toLocaleString('vi-VN')}đ
+                        </span>
                       </div>
-                      <Button variant="secondary" className="w-full">
-                        Tiến hành Thanh toán
-                      </Button>
+                      <SheetClose asChild>
+                        <Button
+                          variant="secondary"
+                          className="w-full"
+                          onClick={goToCheckout}
+                        >
+                          Tiến hành Thanh toán
+                        </Button>
+                      </SheetClose>
                     </div>
                   </SheetFooter>
                 )}
@@ -353,7 +428,7 @@ function Header({ onSearch, allProducts = [] }) {
 
         {/* Mobile Search Bar (Expandable) */}
         {isSearchExpanded && (
-          <form 
+          <form
             onSubmit={handleSearch}
             className="md:hidden pb-4 animate-in slide-in-from-top duration-300"
             ref={searchRef}
@@ -406,7 +481,8 @@ function Header({ onSearch, allProducts = [] }) {
                           {highlightMatch(product.name, searchTerm)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {product.price.toLocaleString('vi-VN')}đ / {product.unit}
+                          {product.price.toLocaleString('vi-VN')}đ /{' '}
+                          {product.unit}
                         </p>
                       </button>
                     ))}
@@ -417,9 +493,12 @@ function Header({ onSearch, allProducts = [] }) {
           </form>
         )}
       </div>
-      
+
       {/* Login Dialog */}
-      <LoginDialog isOpen={showLoginDialog} onClose={() => setShowLoginDialog(false)} />
+      <LoginDialog
+        isOpen={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
+      />
     </header>
   );
 }

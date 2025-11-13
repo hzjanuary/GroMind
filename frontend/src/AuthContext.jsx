@@ -14,16 +14,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const loadUser = async () => {
       const savedToken = localStorage.getItem('token');
-      
+
       if (savedToken) {
         try {
           // Verify token với backend
           const response = await axios.get(`${BACKEND_URL}/api/auth/me`, {
             headers: {
-              Authorization: `Bearer ${savedToken}`
-            }
+              Authorization: `Bearer ${savedToken}`,
+            },
           });
-          
+
           if (response.data.success) {
             setUser(response.data.user);
             setToken(savedToken);
@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
           localStorage.removeItem('token');
         }
       }
-      
+
       setIsLoading(false);
     };
 
@@ -48,19 +48,19 @@ export function AuthProvider({ children }) {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
         email,
-        password
+        password,
       });
 
       if (response.data.success) {
         const { user, token } = response.data;
-        
+
         // Lưu vào state
         setUser(user);
         setToken(token);
-        
+
         // Lưu token vào localStorage
         localStorage.setItem('token', token);
-        
+
         return { success: true };
       }
     } catch (error) {
@@ -76,25 +76,41 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
   };
 
+  // Refresh user data from backend (useful after profile/address updates)
+  const refreshUser = async () => {
+    const savedToken = localStorage.getItem('token') || token;
+    if (!savedToken) return;
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${savedToken}` },
+      });
+      if (response.data.success) {
+        setUser(response.data.user);
+      }
+    } catch (err) {
+      console.error('Error refreshing user:', err);
+    }
+  };
+
   // Hàm đăng ký
   const register = async (name, email, password) => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/auth/register`, {
         name,
         email,
-        password
+        password,
       });
 
       if (response.data.success) {
         const { user, token } = response.data;
-        
+
         // Lưu vào state
         setUser(user);
         setToken(token);
-        
+
         // Lưu token vào localStorage
         localStorage.setItem('token', token);
-        
+
         return { success: true };
       }
     } catch (error) {
@@ -110,14 +126,11 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     login,
     logout,
-    register
+    register,
+    refreshUser,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
