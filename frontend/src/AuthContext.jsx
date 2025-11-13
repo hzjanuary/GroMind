@@ -43,11 +43,11 @@ export function AuthProvider({ children }) {
     loadUser();
   }, []);
 
-  // Hàm đăng nhập
-  const login = async (email, password) => {
+  // Hàm đăng nhập (email hoặc username)
+  const login = async (emailOrUsername, password) => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
-        email,
+        emailOrUsername,
         password,
       });
 
@@ -93,11 +93,12 @@ export function AuthProvider({ children }) {
   };
 
   // Hàm đăng ký
-  const register = async (name, email, password) => {
+  const register = async (name, email, username, password) => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/auth/register`, {
         name,
         email,
+        username,
         password,
       });
 

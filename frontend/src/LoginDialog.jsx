@@ -1,19 +1,19 @@
 // src/LoginDialog.jsx
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Loader2, User, Mail, Lock } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Loader2, User, Mail, Lock } from 'lucide-react';
 
 function LoginDialog({ isOpen, onClose }) {
   const { login, register } = useAuth();
@@ -23,16 +23,17 @@ function LoginDialog({ isOpen, onClose }) {
 
   // Login form state
   const [loginForm, setLoginForm] = useState({
-    email: '',
-    password: ''
+    emailOrUsername: '',
+    password: '',
   });
 
   // Register form state
   const [registerForm, setRegisterForm] = useState({
     name: '',
     email: '',
+    username: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   const handleLogin = async (e) => {
@@ -41,19 +42,19 @@ function LoginDialog({ isOpen, onClose }) {
     setIsLoading(true);
 
     // Validate
-    if (!loginForm.email || !loginForm.password) {
+    if (!loginForm.emailOrUsername || !loginForm.password) {
       setError('Vui lòng điền đầy đủ thông tin');
       setIsLoading(false);
       return;
     }
 
     try {
-      const result = await login(loginForm.email, loginForm.password);
-      
+      const result = await login(loginForm.emailOrUsername, loginForm.password);
+
       if (result.success) {
         setIsLoading(false);
         onClose();
-        setLoginForm({ email: '', password: '' });
+        setLoginForm({ emailOrUsername: '', password: '' });
       } else {
         setError(result.error);
         setIsLoading(false);
@@ -70,7 +71,12 @@ function LoginDialog({ isOpen, onClose }) {
     setIsLoading(true);
 
     // Validate
-    if (!registerForm.name || !registerForm.email || !registerForm.password) {
+    if (
+      !registerForm.name ||
+      !registerForm.email ||
+      !registerForm.username ||
+      !registerForm.password
+    ) {
       setError('Vui lòng điền đầy đủ thông tin');
       setIsLoading(false);
       return;
@@ -92,13 +98,20 @@ function LoginDialog({ isOpen, onClose }) {
       const result = await register(
         registerForm.name,
         registerForm.email,
-        registerForm.password
+        registerForm.username,
+        registerForm.password,
       );
-      
+
       if (result.success) {
         setIsLoading(false);
         onClose();
-        setRegisterForm({ name: '', email: '', password: '', confirmPassword: '' });
+        setRegisterForm({
+          name: '',
+          email: '',
+          username: '',
+          password: '',
+          confirmPassword: '',
+        });
       } else {
         setError(result.error);
         setIsLoading(false);
@@ -129,15 +142,20 @@ function LoginDialog({ isOpen, onClose }) {
           <TabsContent value="login">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
+                <Label htmlFor="login-email">Email hoặc Tên đăng nhập</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="login-email"
-                    type="email"
-                    placeholder="example@email.com"
-                    value={loginForm.email}
-                    onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                    type="text"
+                    placeholder="example@email.com hoặc username"
+                    value={loginForm.emailOrUsername}
+                    onChange={(e) =>
+                      setLoginForm({
+                        ...loginForm,
+                        emailOrUsername: e.target.value,
+                      })
+                    }
                     className="pl-10"
                     disabled={isLoading}
                   />
@@ -153,7 +171,9 @@ function LoginDialog({ isOpen, onClose }) {
                     type="password"
                     placeholder="••••••••"
                     value={loginForm.password}
-                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    onChange={(e) =>
+                      setLoginForm({ ...loginForm, password: e.target.value })
+                    }
                     onKeyDown={(e) => e.key === 'Enter' && handleLogin(e)}
                     className="pl-10"
                     disabled={isLoading}
@@ -168,7 +188,11 @@ function LoginDialog({ isOpen, onClose }) {
                 </Alert>
               )}
 
-              <Button onClick={handleLogin} className="w-full" disabled={isLoading}>
+              <Button
+                onClick={handleLogin}
+                className="w-full"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -193,7 +217,30 @@ function LoginDialog({ isOpen, onClose }) {
                     type="text"
                     placeholder="Tên của bạn là gì?"
                     value={registerForm.name}
-                    onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+                    onChange={(e) =>
+                      setRegisterForm({ ...registerForm, name: e.target.value })
+                    }
+                    className="pl-10"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="register-username">Tên đăng nhập</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="register-username"
+                    type="text"
+                    placeholder="Tên đăng nhập (không chứa khoảng trắng)"
+                    value={registerForm.username}
+                    onChange={(e) =>
+                      setRegisterForm({
+                        ...registerForm,
+                        username: e.target.value,
+                      })
+                    }
                     className="pl-10"
                     disabled={isLoading}
                   />
@@ -209,7 +256,12 @@ function LoginDialog({ isOpen, onClose }) {
                     type="email"
                     placeholder="example@email.com"
                     value={registerForm.email}
-                    onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                    onChange={(e) =>
+                      setRegisterForm({
+                        ...registerForm,
+                        email: e.target.value,
+                      })
+                    }
                     className="pl-10"
                     disabled={isLoading}
                   />
@@ -225,7 +277,12 @@ function LoginDialog({ isOpen, onClose }) {
                     type="password"
                     placeholder="••••••••"
                     value={registerForm.password}
-                    onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                    onChange={(e) =>
+                      setRegisterForm({
+                        ...registerForm,
+                        password: e.target.value,
+                      })
+                    }
                     className="pl-10"
                     disabled={isLoading}
                   />
@@ -241,7 +298,12 @@ function LoginDialog({ isOpen, onClose }) {
                     type="password"
                     placeholder="••••••••"
                     value={registerForm.confirmPassword}
-                    onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                    onChange={(e) =>
+                      setRegisterForm({
+                        ...registerForm,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     onKeyDown={(e) => e.key === 'Enter' && handleRegister(e)}
                     className="pl-10"
                     disabled={isLoading}
@@ -256,7 +318,11 @@ function LoginDialog({ isOpen, onClose }) {
                 </Alert>
               )}
 
-              <Button onClick={handleRegister} className="w-full" disabled={isLoading}>
+              <Button
+                onClick={handleRegister}
+                className="w-full"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
