@@ -123,29 +123,32 @@ router.post('/register', async (req, res) => {
 });
 
 // @route   POST /api/auth/login
-// @desc    Đăng nhập
+// @desc    Đăng nhập (dùng email hoặc username)
 // @access  Public
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
     // Validate input
-    if (!email || !password) {
+    if (!emailOrUsername || !password) {
       return res.status(400).json({
         success: false,
-        error: 'Vui lòng nhập email và mật khẩu',
+        error: 'Vui lòng nhập email/tên đăng nhập và mật khẩu',
       });
     }
 
-    // Tìm user và lấy cả password (dùng select vì password có select: false)
+    // Tìm user theo email hoặc username và lấy cả password (dùng select vì password có select: false)
     const user = await User.findOne({
-      email: email.toLowerCase().trim(),
+      $or: [
+        { email: emailOrUsername.toLowerCase().trim() },
+        { username: emailOrUsername.trim() },
+      ],
     }).select('+password');
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: 'Email hoặc mật khẩu không đúng',
+        error: 'Email/tên đăng nhập hoặc mật khẩu không đúng',
       });
     }
 
@@ -154,7 +157,7 @@ router.post('/login', async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        error: 'Email hoặc mật khẩu không đúng',
+        error: 'Email/tên đăng nhập hoặc mật khẩu không đúng',
       });
     }
 
