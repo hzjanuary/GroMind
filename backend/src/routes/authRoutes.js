@@ -5,7 +5,8 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 
 // Lấy JWT_SECRET từ .env hoặc dùng default
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET =
+  process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
 
 // ===== HELPER FUNCTIONS =====
@@ -13,7 +14,7 @@ const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
 // Tạo JWT token
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRE
+    expiresIn: JWT_EXPIRE,
   });
 };
 
@@ -22,11 +23,11 @@ const verifyToken = async (req, res, next) => {
   try {
     // Lấy token từ header
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        error: 'Không tìm thấy token xác thực'
+        error: 'Không tìm thấy token xác thực',
       });
     }
 
@@ -41,7 +42,7 @@ const verifyToken = async (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      error: 'Token không hợp lệ hoặc đã hết hạn'
+      error: 'Token không hợp lệ hoặc đã hết hạn',
     });
   }
 };
@@ -53,13 +54,13 @@ const verifyToken = async (req, res, next) => {
 // @access  Public
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, username } = req.body;
 
     // Validate input
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        error: 'Vui lòng điền đầy đủ thông tin'
+        error: 'Vui lòng điền đầy đủ thông tin',
       });
     }
 
@@ -67,7 +68,7 @@ router.post('/register', async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        error: 'Mật khẩu phải có ít nhất 6 ký tự'
+        error: 'Mật khẩu phải có ít nhất 6 ký tự',
       });
     }
 
@@ -76,7 +77,7 @@ router.post('/register', async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: 'Email đã được sử dụng'
+        error: 'Email đã được sử dụng',
       });
     }
 
@@ -84,7 +85,8 @@ router.post('/register', async (req, res) => {
     const user = await User.create({
       name: name.trim(),
       email: email.toLowerCase().trim(),
-      password
+      password,
+      username: username ? username.trim() : undefined,
     });
 
     // Tạo token
@@ -97,24 +99,25 @@ router.post('/register', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+        username: user.username,
+      },
     });
   } catch (error) {
     console.error('Register error:', error);
-    
+
     // Xử lý validation errors từ mongoose
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
+      const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
         success: false,
-        error: messages.join(', ')
+        error: messages.join(', '),
       });
     }
 
     res.status(500).json({
       success: false,
-      error: 'Lỗi server khi đăng ký'
+      error: 'Lỗi server khi đăng ký',
     });
   }
 });
@@ -130,19 +133,19 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        error: 'Vui lòng nhập email và mật khẩu'
+        error: 'Vui lòng nhập email và mật khẩu',
       });
     }
 
     // Tìm user và lấy cả password (dùng select vì password có select: false)
-    const user = await User.findOne({ 
-      email: email.toLowerCase().trim() 
+    const user = await User.findOne({
+      email: email.toLowerCase().trim(),
     }).select('+password');
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: 'Email hoặc mật khẩu không đúng'
+        error: 'Email hoặc mật khẩu không đúng',
       });
     }
 
@@ -151,7 +154,7 @@ router.post('/login', async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        error: 'Email hoặc mật khẩu không đúng'
+        error: 'Email hoặc mật khẩu không đúng',
       });
     }
 
@@ -165,14 +168,15 @@ router.post('/login', async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+        username: user.username,
+      },
     });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({
       success: false,
-      error: 'Lỗi server khi đăng nhập'
+      error: 'Lỗi server khi đăng nhập',
     });
   }
 });
@@ -188,7 +192,7 @@ router.get('/me', verifyToken, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'Không tìm thấy user'
+        error: 'Không tìm thấy user',
       });
     }
 
@@ -198,14 +202,16 @@ router.get('/me', verifyToken, async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        createdAt: user.createdAt
-      }
+        username: user.username,
+        addresses: user.addresses || [],
+        createdAt: user.createdAt,
+      },
     });
   } catch (error) {
     console.error('Get me error:', error);
     res.status(500).json({
       success: false,
-      error: 'Lỗi server'
+      error: 'Lỗi server',
     });
   }
 });
@@ -215,25 +221,27 @@ router.get('/me', verifyToken, async (req, res) => {
 // @access  Private
 router.put('/update-profile', verifyToken, async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, username } = req.body;
 
     if (!name || name.trim().length < 2) {
       return res.status(400).json({
         success: false,
-        error: 'Tên phải có ít nhất 2 ký tự'
+        error: 'Tên phải có ít nhất 2 ký tự',
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.userId,
-      { name: name.trim() },
-      { new: true, runValidators: true }
-    );
+    const update = { name: name.trim() };
+    if (typeof username === 'string') update.username = username.trim();
+
+    const user = await User.findByIdAndUpdate(req.userId, update, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'Không tìm thấy user'
+        error: 'Không tìm thấy user',
       });
     }
 
@@ -242,14 +250,16 @@ router.put('/update-profile', verifyToken, async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+        username: user.username,
+        addresses: user.addresses || [],
+      },
     });
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({
       success: false,
-      error: 'Lỗi server'
+      error: 'Lỗi server',
     });
   }
 });
@@ -264,14 +274,14 @@ router.put('/change-password', verifyToken, async (req, res) => {
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
         success: false,
-        error: 'Vui lòng nhập đầy đủ thông tin'
+        error: 'Vui lòng nhập đầy đủ thông tin',
       });
     }
 
     if (newPassword.length < 6) {
       return res.status(400).json({
         success: false,
-        error: 'Mật khẩu mới phải có ít nhất 6 ký tự'
+        error: 'Mật khẩu mới phải có ít nhất 6 ký tự',
       });
     }
 
@@ -280,7 +290,7 @@ router.put('/change-password', verifyToken, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'Không tìm thấy user'
+        error: 'Không tìm thấy user',
       });
     }
 
@@ -289,7 +299,7 @@ router.put('/change-password', verifyToken, async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        error: 'Mật khẩu hiện tại không đúng'
+        error: 'Mật khẩu hiện tại không đúng',
       });
     }
 
@@ -299,14 +309,69 @@ router.put('/change-password', verifyToken, async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Đổi mật khẩu thành công'
+      message: 'Đổi mật khẩu thành công',
     });
   } catch (error) {
     console.error('Change password error:', error);
     res.status(500).json({
       success: false,
-      error: 'Lỗi server'
+      error: 'Lỗi server',
     });
+  }
+});
+
+// ===== Address management =====
+// GET /api/auth/addresses
+router.get('/addresses', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    res.json({ success: true, addresses: user.addresses || [] });
+  } catch (err) {
+    console.error('Get addresses error:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
+  }
+});
+
+// POST /api/auth/addresses
+router.post('/addresses', verifyToken, async (req, res) => {
+  try {
+    const { houseNumber, street, ward, district, city, label, phone } =
+      req.body;
+    const user = await User.findById(req.userId);
+    user.addresses = user.addresses || [];
+    user.addresses.push({
+      houseNumber,
+      street,
+      ward,
+      district,
+      city,
+      phone,
+      label,
+    });
+    await user.save();
+    res.status(201).json({ success: true, addresses: user.addresses });
+  } catch (err) {
+    console.error('Add address error:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
+  }
+});
+
+// DELETE /api/auth/addresses/:index
+router.delete('/addresses/:index', verifyToken, async (req, res) => {
+  try {
+    const idx = parseInt(req.params.index, 10);
+    const user = await User.findById(req.userId);
+    if (!user.addresses || idx < 0 || idx >= user.addresses.length) {
+      return res
+        .status(400)
+        .json({ success: false, error: 'Address not found' });
+    }
+    user.addresses.splice(idx, 1);
+    await user.save();
+    res.json({ success: true, addresses: user.addresses });
+  } catch (err) {
+    console.error('Delete address error:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
   }
 });
 
