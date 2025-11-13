@@ -15,7 +15,16 @@ import {
 
 export default function Checkout() {
   const { cartItems, totalAmount, clearCart } = useCart();
-  const { user, token } = useAuth();
+  const { user, token, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to auth required page if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/auth-required');
+    }
+  }, [isAuthenticated, navigate]);
+
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState('');
   const [houseNumber, setHouseNumber] = useState('');
@@ -29,7 +38,6 @@ export default function Checkout() {
   const [submittedPhone, setSubmittedPhone] = useState(null);
   const [submittedAddress, setSubmittedAddress] = useState(null);
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
   const [savedAddresses, setSavedAddresses] = useState(user?.addresses || []);
   const [useSaved, setUseSaved] = useState(savedAddresses.length > 0);
   const [selectedAddrIndex, setSelectedAddrIndex] = useState(0);

@@ -1,8 +1,10 @@
 // src/Cart.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useCart } from './CartContext';
+import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import LoginDialog from './LoginDialog';
 import {
   Card,
   CardContent,
@@ -17,7 +19,9 @@ function Cart() {
   // Lấy thêm hàm totalAmount từ context
   const { cartItems, itemCount, totalAmount, decreaseQuantity, addToCart } =
     useCart();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   return (
     <Card className="shadow-lg">
@@ -75,12 +79,31 @@ function Cart() {
       </CardContent>
       {cartItems.length > 0 && (
         <CardFooter>
-          {/* Thay thế <button> cũ bằng <Button> */}
-          <Button className="w-full" onClick={() => navigate('/checkout')}>
-            Tiến hành Thanh toán
-          </Button>
+          {isAuthenticated ? (
+            <Button className="w-full" onClick={() => navigate('/checkout')}>
+              Tiến hành Thanh toán
+            </Button>
+          ) : (
+            <div className="w-full space-y-2">
+              <p className="text-sm text-muted-foreground text-center mb-3">
+                Vui lòng đăng nhập để tiếp tục mua hàng
+              </p>
+              <Button
+                className="w-full"
+                onClick={() => setShowLoginPrompt(true)}
+              >
+                Đăng nhập để Thanh toán
+              </Button>
+            </div>
+          )}
         </CardFooter>
       )}
+
+      {/* Login Dialog */}
+      <LoginDialog
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+      />
     </Card>
   );
 }
