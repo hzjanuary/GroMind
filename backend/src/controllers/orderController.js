@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET =
   process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
-// Create new order (optional auth: parse token if present to attach username)
+// Create new order (requires authentication)
 const createOrder = async (req, res) => {
   try {
     const { items, customerName, phone, address, paymentMethod, totalAmount } =
@@ -21,6 +21,25 @@ const createOrder = async (req, res) => {
         .json({ error: 'customerName and phone are required' });
     }
 
+    // Parse token from Authorization header (required)
+    let userId = null;
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+          error: 'Vui lòng đăng nhập để đặt hàng',
+        });
+      }
+
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET);
+      userId = decoded.id;
+    } catch (err) {
+      return res.status(401).json({
+        error: 'Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại',
+      });
+    }
+
     const orderData = {
       items,
       customerName,
@@ -28,34 +47,19 @@ const createOrder = async (req, res) => {
       address,
       paymentMethod,
       totalAmount,
+      user: userId,
     };
 
-    // Try to parse token from Authorization header (optional, guest orders allowed)
-    let userId = null;
+    // Attach user data
     try {
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
-        userId = decoded.id;
+      const User = require('../models/userModel');
+      const user = await User.findById(userId).lean();
+      if (user) {
+        // prefer username if set, otherwise fallback to name
+        orderData.username = user.username || user.name || undefined;
       }
     } catch (err) {
-      // Token parsing/verification failed; continue as guest order
-    }
-
-    // If user is authenticated, attach user id and username
-    if (userId) {
-      orderData.user = userId;
-      try {
-        const User = require('../models/userModel');
-        const user = await User.findById(userId).lean();
-        if (user) {
-          // prefer username if set, otherwise fallback to name
-          orderData.username = user.username || user.name || undefined;
-        }
-      } catch (err) {
-        console.error('Error loading user to attach username to order:', err);
-      }
+      console.error('Error loading user to attach username to order:', err);
     }
 
     const order = new Order(orderData);
