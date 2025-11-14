@@ -5,6 +5,7 @@ import Checkout from './Checkout.jsx';
 import Account from './Account.jsx';
 import MyOrders from './MyOrders.jsx';
 import AuthRequired from './AuthRequired.jsx';
+import NotFound from './NotFound.jsx';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/account" element={<Account />} />
       <Route path="/orders" element={<MyOrders />} />
       <Route path="/auth-required" element={<AuthRequired />} />
+      <Route path="/404" element={<NotFound />} />
     </Routes>
   );
 }

@@ -4,7 +4,6 @@ import { ChefHat } from 'lucide-react';
 
 function FloatingRecipeButton() {
   const [isVisible, setIsVisible] = useState(false);
-  const [isScrolling, setIsScrolling] = useState(false);
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -20,24 +19,9 @@ function FloatingRecipeButton() {
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  const scrollToRecipes = () => {
-    // Tìm section recipes
-    const recipesSection = document.querySelector('[data-recipe-section]');
-    if (recipesSection) {
-      // Bật hiệu ứng
-      setIsScrolling(true);
-
-      // Scroll với animation mượt
-      recipesSection.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-
-      // Tắt hiệu ứng sau khi scroll xong (1 giây)
-      setTimeout(() => {
-        setIsScrolling(false);
-      }, 1000);
-    }
+  const handleOpenDialog = () => {
+    // Dispatch event to open dialog
+    window.dispatchEvent(new CustomEvent('openRecipeDialog'));
   };
 
   return (
@@ -51,31 +35,20 @@ function FloatingRecipeButton() {
         }`}
       >
         <Button
-          onClick={scrollToRecipes}
+          onClick={handleOpenDialog}
           size="lg"
-          className={`rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden pr-6 pl-5 py-6 ${
-            isScrolling ? 'animate-bounce-smooth' : ''
-          }`}
+          className={`rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden pr-6 pl-5 py-6`}
         >
           {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] animate-gradient"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-primary via-accent to-primary bg-size-[200%_100%] animate-gradient"></div>
 
           {/* Content */}
           <div className="relative flex items-center gap-3">
-            <ChefHat
-              className={`h-5 w-5 transition-transform duration-300 ${
-                isScrolling ? 'animate-wiggle' : 'group-hover:animate-bounce'
-              }`}
-            />
+            <ChefHat className="h-5 w-5 transition-transform duration-300 group-hover:animate-bounce" />
             <span className="font-semibold whitespace-nowrap">
-              Bạn chưa biết ăn gì?
+              Trợ lý Minder
             </span>
           </div>
-
-          {/* Ripple effect khi click */}
-          {isScrolling && (
-            <span className="absolute inset-0 animate-ping-slow bg-primary/30 rounded-full"></span>
-          )}
         </Button>
       </div>
 
@@ -93,48 +66,8 @@ function FloatingRecipeButton() {
           }
         }
         
-        @keyframes bounce-smooth {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-        
-        @keyframes wiggle {
-          0%, 100% {
-            transform: rotate(0deg);
-          }
-          25% {
-            transform: rotate(-10deg);
-          }
-          75% {
-            transform: rotate(10deg);
-          }
-        }
-        
-        @keyframes ping-slow {
-          75%, 100% {
-            transform: scale(1.5);
-            opacity: 0;
-          }
-        }
-        
         .animate-gradient {
           animation: gradient 3s ease infinite;
-        }
-        
-        .animate-bounce-smooth {
-          animation: bounce-smooth 0.6s ease-in-out;
-        }
-        
-        .animate-wiggle {
-          animation: wiggle 0.5s ease-in-out infinite;
-        }
-        
-        .animate-ping-slow {
-          animation: ping-slow 1s cubic-bezier(0, 0, 0.2, 1);
         }
       `}</style>
     </>

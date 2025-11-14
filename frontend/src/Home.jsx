@@ -10,8 +10,8 @@ import ProductList from './ProductList.jsx';
 import Footer from './Footer.jsx';
 import RecipeSuggestion from './RecipeSuggestion.jsx';
 import RecipeSearch from './RecipeSearch.jsx';
+import RecipeDialog from './RecipeDialog.jsx';
 import FloatingRecipeButton from './FloatingRecipeButton.jsx';
-import { useScrollReveal } from './hooks/useScrollReveal.js';
 
 // URL backend
 const BACKEND_URL = 'http://localhost:5000';
@@ -20,14 +20,7 @@ export default function Home() {
   const [allProducts, setAllProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Scroll reveal hooks cho từng section
-  const [recipeSuggestionRef, isSuggestionVisible] = useScrollReveal({
-    threshold: 0.2,
-  });
-  const [recipeSearchRef, isSearchVisible] = useScrollReveal({
-    threshold: 0.2,
-  });
+  const [showRecipeDialog, setShowRecipeDialog] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -39,6 +32,15 @@ export default function Home() {
       }
     };
     fetchProducts();
+
+    // Listen for custom event from FloatingRecipeButton
+    const handleOpenRecipeDialog = () => setShowRecipeDialog(true);
+
+    window.addEventListener('openRecipeDialog', handleOpenRecipeDialog);
+
+    return () => {
+      window.removeEventListener('openRecipeDialog', handleOpenRecipeDialog);
+    };
   }, []);
 
   const filteredProducts = selectedCategory
@@ -101,34 +103,27 @@ export default function Home() {
 
           <hr />
 
-          {/* THÊM data-recipe-section để FloatingButton có thể scroll tới đây */}
-          <section className="space-y-8" data-recipe-section>
-            {/* RecipeSuggestion với scroll animation */}
-            <div
-              ref={recipeSuggestionRef}
-              className={`transition-all duration-1000 ease-out ${
-                isSuggestionVisible
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-20'
-              }`}
-            >
+          {/* Hidden Recipe Sections - Only shown via dialogs */}
+          <section className="space-y-8 hidden" data-recipe-section>
+            {/* RecipeSuggestion - Hidden */}
+            <div>
               <RecipeSuggestion allProducts={allProducts} />
             </div>
 
-            {/* RecipeSearch với scroll animation (delay hơn) */}
-            <div
-              ref={recipeSearchRef}
-              className={`transition-all duration-1000 ease-out delay-200 ${
-                isSearchVisible
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-20'
-              }`}
-            >
+            {/* RecipeSearch - Hidden */}
+            <div>
               <RecipeSearch allProducts={allProducts} />
             </div>
           </section>
         </main>
       </div>
+
+      {/* Recipe Dialog - Single dialog with tabs */}
+      <RecipeDialog
+        isOpen={showRecipeDialog}
+        onClose={() => setShowRecipeDialog(false)}
+        allProducts={allProducts}
+      />
 
       <Footer />
       <FloatingRecipeButton />
