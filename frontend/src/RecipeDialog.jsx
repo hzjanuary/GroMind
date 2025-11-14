@@ -195,7 +195,7 @@ function RecipeDialog({ isOpen, onClose, allProducts }) {
           <TabsContent value="suggest" className="space-y-4">
             <div className="space-y-2">
               <label className="block text-sm font-medium">
-                Nhập nguyên liệu bạn cần gợi ý  
+                Nhập nguyên liệu bạn cần gợi ý
               </label>
               <div className="flex gap-2">
                 <Input
