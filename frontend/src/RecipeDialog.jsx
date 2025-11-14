@@ -39,6 +39,25 @@ function RecipeDialog({ isOpen, onClose, allProducts }) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState(null);
 
+  // Handle tab change - clear data from previous tab
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+
+    // Clear suggestion tab data when switching away
+    if (tab === 'search') {
+      setSuggestionInput('');
+      setSuggestion('');
+      setSuggestionError(null);
+    }
+
+    // Clear search tab data when switching away
+    if (tab === 'suggest') {
+      setSearchTerm('');
+      setRecipe(null);
+      setSearchError(null);
+    }
+  };
+
   const handleGetSuggestion = async () => {
     if (!suggestionInput) {
       setSuggestionError('Vui lòng nhập một nguyên liệu.');
@@ -99,14 +118,12 @@ function RecipeDialog({ isOpen, onClose, allProducts }) {
   };
 
   const handleAddAllToCart = () => {
-    if (!recipe) return;
+    if (!recipe || !recipe.ingredients) return;
 
-    recipe.ingredients.forEach((ingredient) => {
-      const product = allProducts.find((p) =>
-        p.name.toLowerCase().includes(ingredient.name.toLowerCase()),
-      );
-      if (product) {
-        addToCart(product);
+    recipe.ingredients.forEach((ingredientItem) => {
+      // ingredientItem has structure: { product: { _id, name, price, unit, ... } }
+      if (ingredientItem.product) {
+        addToCart(ingredientItem.product);
       }
     });
 
@@ -168,7 +185,7 @@ function RecipeDialog({ isOpen, onClose, allProducts }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[750px] max-h-[88vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ChefHat className="h-5 w-5" />
@@ -179,7 +196,11 @@ function RecipeDialog({ isOpen, onClose, allProducts }) {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="suggest" className="gap-2">
               <Sparkles className="h-4 w-4" />
@@ -286,35 +307,33 @@ function RecipeDialog({ isOpen, onClose, allProducts }) {
             {recipe && (
               <div className="space-y-4 border rounded-lg p-4">
                 <div>
-                  <h3 className="font-bold text-lg mb-2">{recipe.dishName}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {recipe.description}
-                  </p>
+                  <h3 className="font-bold text-lg mb-2">{recipe.name}</h3>
                 </div>
 
                 <div>
                   <h4 className="font-semibold mb-2">Nguyên liệu:</h4>
                   <ul className="space-y-1">
-                    {recipe.ingredients.map((ingredient, idx) => {
-                      const isAvailable = allProducts.some((p) =>
-                        p.name
-                          .toLowerCase()
-                          .includes(ingredient.name.toLowerCase()),
-                      );
-                      return (
-                        <li
-                          key={idx}
-                          className={`text-sm ${
-                            isAvailable
-                              ? 'text-foreground'
-                              : 'text-muted-foreground line-through'
-                          }`}
-                        >
-                          {ingredient.name}
-                          {!isAvailable && ' (không có)'}
-                        </li>
-                      );
-                    })}
+                    {recipe.ingredients &&
+                      recipe.ingredients.map((ingredientItem, idx) => {
+                        const product = ingredientItem.product;
+                        const isAvailable = allProducts.some(
+                          (p) =>
+                            p.name.toLowerCase() === product.name.toLowerCase(),
+                        );
+                        return (
+                          <li
+                            key={idx}
+                            className={`text-sm ${
+                              isAvailable
+                                ? 'text-foreground'
+                                : 'text-muted-foreground line-through'
+                            }`}
+                          >
+                            {product.name}
+                            {!isAvailable && ' (không có)'}
+                          </li>
+                        );
+                      })}
                   </ul>
                 </div>
 
