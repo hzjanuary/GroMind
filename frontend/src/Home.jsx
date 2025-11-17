@@ -147,77 +147,77 @@ export default function Home() {
           </aside>
 
           <main className="lg:col-span-3 space-y-8">
-          {/* Featured Products Section */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-3xl font-bold">Sản phẩm khuyến mãi</h2>
-            </div>
-            {featuredProducts.length > 0 ? (
-              <div className="space-y-4">
-                <ProductList products={featuredProducts} />
+            {/* Featured Products Section */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-3xl font-bold">Sản phẩm khuyến mãi</h2>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground text-lg">
-                  Chưa có sản phẩm khuyến mãi
-                </p>
-              </div>
-            )}
-          </section>
+              {featuredProducts.length > 0 ? (
+                <div className="space-y-4">
+                  <ProductList products={featuredProducts} />
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground text-lg">
+                    Chưa có sản phẩm khuyến mãi
+                  </p>
+                </div>
+              )}
+            </section>
 
-          <hr />
+            <hr />
 
-          {/* Categories with Products */}
-          <section className="space-y-8">
-            {categories.map((category) => {
-              const categoryProducts = getProductsByCategory(category._id);
-              const totalProducts = allProducts.filter(
-                (p) => p.category === category._id,
-              ).length;
-              const hasMore = totalProducts > 4;
+            {/* Categories with Products */}
+            <section className="space-y-8">
+              {categories.map((category) => {
+                const categoryProducts = getProductsByCategory(category._id);
+                const totalProducts = allProducts.filter(
+                  (p) => p.category === category._id,
+                ).length;
+                const hasMore = totalProducts > 4;
 
-              return (
-                <div key={category._id}>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-2xl font-bold">{category.name}</h3>
-                    {hasMore && (
-                      <Link
-                        to="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setSelectedCategory(category._id);
-                          setSearchQuery('');
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="text-primary hover:underline text-sm"
-                      >
-                        Xem thêm →
-                      </Link>
+                return (
+                  <div key={category._id}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-2xl font-bold">{category.name}</h3>
+                      {hasMore && (
+                        <Link
+                          to="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setSelectedCategory(category._id);
+                            setSearchQuery('');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="text-primary hover:underline text-sm"
+                        >
+                          Xem thêm →
+                        </Link>
+                      )}
+                    </div>
+                    {categoryProducts.length > 0 ? (
+                      <ProductList products={categoryProducts} />
+                    ) : (
+                      <p className="text-muted-foreground">
+                        Chưa có sản phẩm trong danh mục này
+                      </p>
                     )}
                   </div>
-                  {categoryProducts.length > 0 ? (
-                    <ProductList products={categoryProducts} />
-                  ) : (
-                    <p className="text-muted-foreground">
-                      Chưa có sản phẩm trong danh mục này
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-          </section>
+                );
+              })}
+            </section>
 
-          <hr />
+            <hr />
 
-          {/* Hidden Recipe Sections */}
-          <section className="space-y-8 hidden" data-recipe-section>
-            <div>
-              <RecipeSuggestion allProducts={allProducts} />
-            </div>
-            <div>
-              <RecipeSearch allProducts={allProducts} />
-            </div>
-          </section>
+            {/* Hidden Recipe Sections */}
+            <section className="space-y-8 hidden" data-recipe-section>
+              <div>
+                <RecipeSuggestion allProducts={allProducts} />
+              </div>
+              <div>
+                <RecipeSearch allProducts={allProducts} />
+              </div>
+            </section>
           </main>
         </div>
       )}
