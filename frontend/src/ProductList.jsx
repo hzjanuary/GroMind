@@ -1,5 +1,5 @@
 // src/ProductList.jsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useCart } from './CartContext.jsx';
 import { Button } from '@/components/ui/button'; // Đảm bảo import này đúng
 import {
@@ -14,7 +14,12 @@ function ProductList({ products }) {
   const { addToCart } = useCart();
   const [toast, setToast] = useState(null);
 
-  if (products.length === 0) {
+  // Sort products alphabetically by name
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+  }, [products]);
+
+  if (sortedProducts.length === 0) {
     return <p>Đang tải sản phẩm...</p>;
   }
 
@@ -36,7 +41,7 @@ function ProductList({ products }) {
         </div>
       )}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {products.map((product) => (
+        {sortedProducts.map((product) => (
           <Card
             key={product._id}
             className="shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary cursor-pointer"

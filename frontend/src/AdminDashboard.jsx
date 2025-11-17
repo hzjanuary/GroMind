@@ -327,9 +327,10 @@ export default function AdminDashboard() {
         )}
 
         <Tabs defaultValue="orders" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="orders">Đơn hàng</TabsTrigger>
             <TabsTrigger value="catalog">Danh mục & Sản phẩm</TabsTrigger>
+            <TabsTrigger value="featured">Khuyến mãi</TabsTrigger>
           </TabsList>
 
           {/* Orders Tab */}
@@ -762,6 +763,134 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+          </TabsContent>
+
+          {/* Featured Products Tab */}
+          <TabsContent value="featured" className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">
+              Quản lý Sản phẩm Khuyến mãi
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Chọn tối đa 4 sản phẩm để hiển thị trên trang chủ
+            </p>
+
+            {/* Featured Products List */}
+            <div className="space-y-2">
+              {products
+                .filter((p) => p.isFeatured)
+                .map((prod) => (
+                  <div
+                    key={prod._id}
+                    className="p-3 border rounded flex justify-between items-start bg-yellow-50"
+                  >
+                    <div>
+                      <div className="font-semibold">{prod.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {prod.price?.toLocaleString('vi-VN')}đ / {prod.unit}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={async () => {
+                        try {
+                          await axios.patch(
+                            `${BACKEND_URL}/api/products/${prod._id}/featured`,
+                            { isFeatured: false },
+                            authHeader,
+                          );
+                          setProducts(
+                            products.map((p) =>
+                              p._id === prod._id
+                                ? { ...p, isFeatured: false }
+                                : p,
+                            ),
+                          );
+                          setStatus({
+                            type: 'success',
+                            text: 'Đã xóa khỏi khuyến mãi',
+                          });
+                          setTimeout(() => setStatus(null), 2000);
+                        } catch {
+                          setStatus({
+                            type: 'error',
+                            text: 'Lỗi khi cập nhật',
+                          });
+                        }
+                      }}
+                    >
+                      Xóa
+                    </Button>
+                  </div>
+                ))}
+            </div>
+
+            {products.filter((p) => p.isFeatured).length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Chưa có sản phẩm khuyến mãi
+              </p>
+            )}
+
+            {products.filter((p) => p.isFeatured).length < 4 && (
+              <>
+                <hr className="my-4" />
+                <h3 className="font-semibold mb-3">
+                  Thêm sản phẩm khuyến mãi (
+                  {products.filter((p) => p.isFeatured).length}/4)
+                </h3>
+                <div className="space-y-2">
+                  {products
+                    .filter((p) => !p.isFeatured)
+                    .sort((a, b) => a.name.localeCompare(b.name, 'vi'))
+                    .map((prod) => (
+                      <div
+                        key={prod._id}
+                        className="p-3 border rounded flex justify-between items-start"
+                      >
+                        <div>
+                          <div className="font-semibold text-sm">
+                            {prod.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {prod.price?.toLocaleString('vi-VN')}đ / {prod.unit}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              await axios.patch(
+                                `${BACKEND_URL}/api/products/${prod._id}/featured`,
+                                { isFeatured: true },
+                                authHeader,
+                              );
+                              setProducts(
+                                products.map((p) =>
+                                  p._id === prod._id
+                                    ? { ...p, isFeatured: true }
+                                    : p,
+                                ),
+                              );
+                              setStatus({
+                                type: 'success',
+                                text: 'Đã thêm vào khuyến mãi',
+                              });
+                              setTimeout(() => setStatus(null), 2000);
+                            } catch {
+                              setStatus({
+                                type: 'error',
+                                text: 'Lỗi khi cập nhật',
+                              });
+                            }
+                          }}
+                        >
+                          Thêm
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>

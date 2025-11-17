@@ -15,7 +15,7 @@ function CategorySidebar({ onSelectCategory, selectedCategory }) {
         const response = await axios.get(`${BACKEND_URL}/api/categories`);
         setCategories(response.data);
       } catch (err) {
-        console.error("Lỗi khi tải danh mục:", err);
+        console.error('Lỗi khi tải danh mục:', err);
       }
     };
     fetchCategories();
@@ -28,17 +28,10 @@ function CategorySidebar({ onSelectCategory, selectedCategory }) {
         Danh mục sản phẩm
       </h3>
       <div className="space-y-2">
-        <Button
-          variant={!selectedCategory ? "secondary" : "ghost"}
-          className="w-full justify-start cursor-pointer"
-          onClick={() => onSelectCategory(null)}
-        >
-          Tất cả sản phẩm
-        </Button>
-        {categories.map(category => (
+        {categories.map((category) => (
           <Button
             key={category._id}
-            variant={selectedCategory === category._id ? "secondary" : "ghost"}
+            variant={selectedCategory === category._id ? 'secondary' : 'ghost'}
             className="w-full justify-start cursor-pointer"
             onClick={() => onSelectCategory(category._id)}
           >

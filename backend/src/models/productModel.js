@@ -5,11 +5,12 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: Number,
   unit: String,
-  category: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Category', 
-    required: true 
-  }
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: true,
+  },
+  isFeatured: { type: Boolean, default: false },
 });
 
 const Product = mongoose.model('Product', productSchema);

@@ -80,4 +80,32 @@ router.delete('/:id', verifyToken, async (req, res) => {
   }
 });
 
+// PATCH /api/products/:id/featured - toggle featured status (admin only)
+router.patch('/:id/featured', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).lean();
+    if (!user || user.username !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
+
+    const { isFeatured } = req.body;
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { isFeatured },
+      { new: true },
+    );
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, error: 'Không tìm thấy sản phẩm' });
+    }
+
+    res.json({ success: true, product });
+  } catch (err) {
+    console.error('Error updating featured status:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
+  }
+});
+
 module.exports = router;
