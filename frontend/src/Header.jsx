@@ -184,7 +184,7 @@ function Header({ onSearch, allProducts = [] }) {
           {/* Logo */}
           <a
             href="/"
-            className="text-2xl font-bold transition-transform hover:scale-105 cursor-pointer flex-shrink-0"
+            className="text-2xl font-bold transition-transform hover:scale-105 cursor-pointer shrink-0"
           >
             GroMind
           </a>
@@ -291,6 +291,17 @@ function Header({ onSearch, allProducts = [] }) {
                     Tài khoản của tôi
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border" />
+                  {user?.username === 'admin' && (
+                    <>
+                      <DropdownMenuItem
+                        className="text-card-foreground hover:bg-accent cursor-pointer"
+                        onClick={() => navigate('/admin')}
+                      >
+                        ⚙️ Bảng điều khiển Quản trị
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-border" />
+                    </>
+                  )}
                   <DropdownMenuItem
                     className="text-card-foreground hover:bg-accent cursor-pointer"
                     onClick={goToAccount}

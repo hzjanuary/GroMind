@@ -57,4 +57,58 @@ router.delete('/cleanup-guest', verifyToken, async (req, res) => {
   }
 });
 
+// GET /api/orders/all - get all orders (admin only)
+router.get('/all', verifyToken, async (req, res) => {
+  try {
+    const User = require('../models/userModel');
+    const user = await User.findById(req.userId).lean();
+
+    if (!user || user.username !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
+
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json({ success: true, orders });
+  } catch (err) {
+    console.error('Error fetching all orders:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
+  }
+});
+
+// PATCH /api/orders/:orderId/status - update order status (admin only)
+router.patch('/:orderId/status', verifyToken, async (req, res) => {
+  try {
+    const User = require('../models/userModel');
+    const user = await User.findById(req.userId).lean();
+
+    if (!user || user.username !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
+
+    const { status } = req.body;
+    if (!['Đã đặt', 'Đang giao', 'Thành công'].includes(status)) {
+      return res
+        .status(400)
+        .json({ success: false, error: 'Trạng thái không hợp lệ' });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.orderId,
+      { status },
+      { new: true },
+    );
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, error: 'Không tìm thấy đơn hàng' });
+    }
+
+    res.json({ success: true, order });
+  } catch (err) {
+    console.error('Error updating order status:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
+  }
+});
+
 module.exports = router;

@@ -25,6 +25,12 @@ export default function Account() {
   const [status, setStatus] = useState(null);
 
   useEffect(() => {
+    if (isAuthenticated) {
+      refreshUser();
+    }
+  }, [isAuthenticated, refreshUser]);
+
+  useEffect(() => {
     setName(user?.name || '');
     setUsername(user?.username || '');
     setAddresses(user?.addresses || []);
