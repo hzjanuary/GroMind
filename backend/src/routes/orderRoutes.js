@@ -86,7 +86,7 @@ router.patch('/:orderId/status', verifyToken, async (req, res) => {
     }
 
     const { status } = req.body;
-    if (!['Đã đặt', 'Đang giao', 'Thành công'].includes(status)) {
+    if (!['ordered', 'pending', 'completed'].includes(status)) {
       return res
         .status(400)
         .json({ success: false, error: 'Trạng thái không hợp lệ' });

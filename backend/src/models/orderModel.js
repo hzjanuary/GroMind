@@ -33,6 +33,11 @@ const orderSchema = new mongoose.Schema({
   address: addressSchema,
   paymentMethod: { type: String, enum: ['cash', 'card'], default: 'cash' },
   totalAmount: { type: Number, required: true },
+  status: {
+    type: String,
+    enum: ['ordered', 'pending', 'completed'],
+    default: 'ordered',
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

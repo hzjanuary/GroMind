@@ -38,12 +38,19 @@ router.put('/:id', verifyToken, async (req, res) => {
       return res.status(403).json({ success: false, error: 'Forbidden' });
     }
 
-    const { name, price, unit, category } = req.body;
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { name, price, unit, category },
-      { new: true },
-    );
+    const { name, price, unit, category, discountPercent, discountEndTime } =
+      req.body;
+    const updateData = { name, price, unit, category };
+
+    // Add discount fields if provided
+    if (discountPercent !== undefined)
+      updateData.discountPercent = discountPercent;
+    if (discountEndTime !== undefined)
+      updateData.discountEndTime = discountEndTime;
+
+    const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
 
     if (!product) {
       return res

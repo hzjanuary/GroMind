@@ -11,6 +11,8 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   isFeatured: { type: Boolean, default: false },
+  discountPercent: { type: Number, default: 0, min: 0, max: 100 },
+  discountEndTime: { type: Date, default: null },
 });
 
 const Product = mongoose.model('Product', productSchema);
