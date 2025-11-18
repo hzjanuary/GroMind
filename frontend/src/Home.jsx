@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 // Import các component
 import Header from './Header.jsx';
@@ -23,6 +22,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showRecipeDialog, setShowRecipeDialog] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,14 +54,6 @@ export default function Home() {
     .filter((p) => p.isFeatured)
     .sort((a, b) => a.name.localeCompare(b.name, 'vi'))
     .slice(0, 4);
-
-  // Get products for a specific category, sorted A-Z, max 4
-  const getProductsByCategory = (categoryId) => {
-    return allProducts
-      .filter((p) => p.category === categoryId)
-      .sort((a, b) => a.name.localeCompare(b.name, 'vi'))
-      .slice(0, 4);
-  };
 
   const filteredProducts = selectedCategory
     ? allProducts.filter((product) => product.category === selectedCategory)
@@ -170,33 +162,56 @@ export default function Home() {
             {/* Categories with Products */}
             <section className="space-y-8">
               {categories.map((category) => {
-                const categoryProducts = getProductsByCategory(category._id);
-                const totalProducts = allProducts.filter(
-                  (p) => p.category === category._id,
-                ).length;
-                const hasMore = totalProducts > 4;
+                const isExpanded = expandedCategories[category._id];
+                const allCategoryProducts = allProducts
+                  .filter((p) => p.category === category._id)
+                  .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+                const displayedProducts = isExpanded
+                  ? allCategoryProducts
+                  : allCategoryProducts.slice(0, 4);
+                const hasMore = allCategoryProducts.length > 4;
 
                 return (
                   <div key={category._id}>
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-2xl font-bold">{category.name}</h3>
-                      {hasMore && (
-                        <Link
-                          to="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setSelectedCategory(category._id);
-                            setSearchQuery('');
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }}
-                          className="text-primary hover:underline text-sm"
-                        >
-                          Xem thêm →
-                        </Link>
-                      )}
                     </div>
-                    {categoryProducts.length > 0 ? (
-                      <ProductList products={categoryProducts} />
+                    {displayedProducts.length > 0 ? (
+                      <>
+                        <ProductList products={displayedProducts} />
+                        {hasMore && !isExpanded && (
+                          <div className="text-center mt-4">
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                setExpandedCategories({
+                                  ...expandedCategories,
+                                  [category._id]: true,
+                                })
+                              }
+                              className="px-8"
+                            >
+                              Xem thêm {allCategoryProducts.length - 4} sản phẩm
+                            </Button>
+                          </div>
+                        )}
+                        {isExpanded && (
+                          <div className="text-center mt-4">
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                setExpandedCategories({
+                                  ...expandedCategories,
+                                  [category._id]: false,
+                                })
+                              }
+                              className="px-8"
+                            >
+                              Thu gọn
+                            </Button>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <p className="text-muted-foreground">
                         Chưa có sản phẩm trong danh mục này

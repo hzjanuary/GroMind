@@ -139,10 +139,10 @@ export default function Account() {
               className="p-2 border rounded"
             />
             <input
-              placeholder="Username (tùy chọn)"
+              placeholder="Username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="p-2 border rounded"
+              disabled
+              className="p-2 border rounded bg-gray-100 cursor-not-allowed"
             />
             <div />
             <Button onClick={handleUpdateProfile}>Lưu thông tin</Button>

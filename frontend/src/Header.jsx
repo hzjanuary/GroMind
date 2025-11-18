@@ -274,76 +274,15 @@ function Header({ onSearch, allProducts = [] }) {
 
             <ThemeToggle />
 
-            {/* Login/User Menu */}
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="hover:bg-primary/80 gap-2">
-                    <User className="h-5 w-5" />
-                    <span className="hidden lg:inline">{user.name}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 bg-card border-border"
-                >
-                  <DropdownMenuLabel className="text-card-foreground">
-                    Tài khoản của tôi
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-border" />
-                  {user?.username === 'admin' && (
-                    <>
-                      <DropdownMenuItem
-                        className="text-card-foreground hover:bg-accent cursor-pointer"
-                        onClick={() => navigate('/admin')}
-                      >
-                        ⚙️ Bảng điều khiển Quản trị
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-border" />
-                    </>
-                  )}
-                  <DropdownMenuItem
-                    className="text-card-foreground hover:bg-accent cursor-pointer"
-                    onClick={goToAccount}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Thông tin cá nhân
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-card-foreground hover:bg-accent cursor-pointer"
-                    onClick={goToOrders}
-                  >
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    Đơn hàng của tôi
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-border" />
-                  <DropdownMenuItem
-                    onClick={logout}
-                    className="text-red-500 hover:bg-red-500/10 hover:text-red-600 cursor-pointer"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Đăng xuất
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button
-                variant="ghost"
-                className="hidden sm:flex hover:bg-primary/80 cursor-pointer"
-                onClick={() => setShowLoginDialog(true)}
-              >
-                <LogIn className="mr-2 h-5 w-5" />
-                <span className="hidden lg:inline">Đăng nhập</span>
-              </Button>
-            )}
-
+            {/* Cart Sheet */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative hover:bg-primary/80 cursor-pointer"
+                  className="relative hover:bg-primary/80 cursor-pointer flex items-center gap-2"
                 >
                   <ShoppingBag className="h-6 w-6" />
+                  <span className="hidden sm:inline">Giỏ hàng</span>
                   {itemCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {itemCount}
@@ -434,6 +373,69 @@ function Header({ onSearch, allProducts = [] }) {
                 )}
               </SheetContent>
             </Sheet>
+
+            {/* Login/User Menu */}
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="hover:bg-primary/80 gap-2">
+                    <User className="h-5 w-5" />
+                    <span className="hidden lg:inline">{user.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-card border-border"
+                >
+                  <DropdownMenuLabel className="text-card-foreground">
+                    Tài khoản của tôi
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-border" />
+                  {user?.username === 'admin' && (
+                    <>
+                      <DropdownMenuItem
+                        className="text-card-foreground hover:bg-accent cursor-pointer"
+                        onClick={() => navigate('/admin')}
+                      >
+                        ⚙️ Bảng điều khiển Quản trị
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-border" />
+                    </>
+                  )}
+                  <DropdownMenuItem
+                    className="text-card-foreground hover:bg-accent cursor-pointer"
+                    onClick={goToAccount}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Thông tin cá nhân
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-card-foreground hover:bg-accent cursor-pointer"
+                    onClick={goToOrders}
+                  >
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    Đơn hàng của tôi
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-border" />
+                  <DropdownMenuItem
+                    onClick={logout}
+                    className="text-red-500 hover:bg-red-500/10 hover:text-red-600 cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Đăng xuất
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                className="hidden sm:flex hover:bg-primary/80 cursor-pointer"
+                onClick={() => setShowLoginDialog(true)}
+              >
+                <LogIn className="mr-2 h-5 w-5" />
+                <span className="hidden lg:inline">Đăng nhập</span>
+              </Button>
+            )}
           </div>
         </div>
 
