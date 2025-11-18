@@ -108,3 +108,14 @@ html {
 .animate-fade-in-right {
   animation: fadeInRight 0.8s ease-out forwards;
 }
+
+/* Input datetime-local calendar icon color */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.9);
+  cursor: pointer;
+}
+
+/* For Firefox */
+input[type="datetime-local"]::before {
+  color: white;
+}
