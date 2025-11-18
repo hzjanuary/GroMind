@@ -73,6 +73,20 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    // Force dark mode for admin dashboard
+    const root = document.documentElement;
+    root.classList.add('dark');
+
+    // Cleanup: restore to previous state when leaving admin
+    return () => {
+      const theme = localStorage.getItem('theme');
+      if (theme !== 'dark') {
+        root.classList.remove('dark');
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const loadAllData = async () => {
       if (isAuthenticated && user?.username === 'admin') {
         setLoading(true);

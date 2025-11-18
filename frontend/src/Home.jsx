@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
+import { Clock } from 'lucide-react';
 
 // Import các component
 import Header from './Header.jsx';
@@ -15,6 +16,46 @@ import FloatingRecipeButton from './FloatingRecipeButton.jsx';
 
 // URL backend
 const BACKEND_URL = 'http://localhost:5000';
+
+// Countdown Badge Component
+function CountdownBadge({ endTime }) {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const difference = new Date(endTime) - new Date();
+
+      if (difference <= 0) {
+        setTimeLeft('Đã hết hạn');
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+
+      if (days > 0) {
+        setTimeLeft(`${days}d ${hours}h`);
+      } else if (hours > 0) {
+        setTimeLeft(`${hours}h ${minutes}m`);
+      } else {
+        setTimeLeft(`${minutes}m ${seconds}s`);
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, [endTime]);
+
+  return (
+    <div className="flex items-center gap-1 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+      <Clock className="h-3 w-3" />
+      <span>{timeLeft}</span>
+    </div>
+  );
+}
 
 export default function Home() {
   const [allProducts, setAllProducts] = useState([]);
@@ -143,6 +184,17 @@ export default function Home() {
             <section>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-3xl font-bold">Sản phẩm khuyến mãi</h2>
+                {featuredProducts.length > 0 &&
+                  featuredProducts[0]?.discountEndTime && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-gray-600 dark:text-gray-300">
+                        Kết thúc trong
+                      </span>
+                      <CountdownBadge
+                        endTime={featuredProducts[0].discountEndTime}
+                      />
+                    </div>
+                  )}
               </div>
               {featuredProducts.length > 0 ? (
                 <div className="space-y-4">

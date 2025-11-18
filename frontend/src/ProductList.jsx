@@ -11,31 +11,31 @@ import {
 } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 
-// Countdown Timer Component
+// Countdown Timer Component - Format HH:MM:SS
 function CountdownTimer({ endTime }) {
-  const [timeLeft, setTimeLeft] = useState('');
+  const [timeLeft, setTimeLeft] = useState('00:00:00');
 
   useEffect(() => {
     const calculateTimeLeft = () => {
       const difference = new Date(endTime) - new Date();
 
       if (difference <= 0) {
-        setTimeLeft('Đã hết hạn');
+        setTimeLeft('Hết hạn');
         return;
       }
 
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
+      const hours = String(
+        Math.floor((difference / (1000 * 60 * 60)) % 24),
+      ).padStart(2, '0');
+      const minutes = String(
+        Math.floor((difference / 1000 / 60) % 60),
+      ).padStart(2, '0');
+      const seconds = String(Math.floor((difference / 1000) % 60)).padStart(
+        2,
+        '0',
+      );
 
-      if (days > 0) {
-        setTimeLeft(`${days}d ${hours}h`);
-      } else if (hours > 0) {
-        setTimeLeft(`${hours}h ${minutes}m`);
-      } else {
-        setTimeLeft(`${minutes}m ${seconds}s`);
-      }
+      setTimeLeft(`${hours}:${minutes}:${seconds}`);
     };
 
     calculateTimeLeft();
@@ -45,9 +45,9 @@ function CountdownTimer({ endTime }) {
   }, [endTime]);
 
   return (
-    <div className="flex items-center gap-1 text-xs text-white bg-red-500 px-2 py-1 rounded">
-      <Clock className="h-3 w-3" />
-      <span>{timeLeft}</span>
+    <div className="text-xs text-gray-600 dark:text-gray-400">
+      Kết thúc sau{' '}
+      <span className="font-semibold text-red-500">{timeLeft}</span>
     </div>
   );
 }
@@ -105,26 +105,26 @@ function ProductList({ products, showLoadMore = false, onLoadMore }) {
           return (
             <Card
               key={product._id}
-              className="shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary cursor-pointer relative"
+              className="shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer relative flex flex-col h-full border border-gray-200 dark:border-gray-700"
+              style={{
+                backgroundColor: 'rgb(249, 250, 251)',
+              }}
             >
               {hasActiveDiscount && (
                 <div className="absolute top-2 left-2 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                   -{product.discountPercent}%
                 </div>
               )}
-              <CardHeader>
-                <CardTitle className="text-base font-semibold h-12 overflow-hidden text-ellipsis">
-                  {product.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
+
+              {/* Image Section - Full Height with Ratio */}
+              <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
                 <img
                   src={`https://via.placeholder.com/200?text=${product.name.replace(
                     ' ',
                     '+',
                   )}`}
                   alt={product.name}
-                  className="w-full h-36 object-cover"
+                  className="w-full aspect-square object-cover"
                   onError={(e) => {
                     try {
                       if (!e.currentTarget.dataset.fallback) {
@@ -136,38 +136,64 @@ function ProductList({ products, showLoadMore = false, onLoadMore }) {
                     }
                   }}
                 />
-                <div className="p-4 space-y-1">
+              </div>
+
+              {/* Content Section - Separate from Image */}
+              <div className="flex flex-col flex-grow bg-gray-50 dark:bg-gray-900">
+                {/* Product Name - Clear Separation */}
+                <div className="px-3 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+                  <p className="text-sm font-semibold text-black dark:text-white line-clamp-2 leading-tight">
+                    {product.name}
+                  </p>
+                </div>
+
+                {/* Price & Discount Info */}
+                <div className="px-3 py-2 space-y-2 flex-grow bg-gray-50 dark:bg-gray-900">
                   {hasActiveDiscount ? (
                     <>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 line-through">
-                        {product.price.toLocaleString('vi-VN')}đ
-                      </p>
-                      <p className="text-sm text-red-600 dark:text-red-500 font-bold">
-                        {discountedPrice.toLocaleString('vi-VN')}đ /{' '}
-                        {product.unit}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 line-through">
+                          {product.price.toLocaleString('vi-VN')}đ
+                        </span>
+                        <span className="text-xs font-semibold text-red-500 bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded">
+                          -{product.discountPercent}%
+                        </span>
+                      </div>
+                      <p className="text-sm font-bold text-red-600 dark:text-red-500">
+                        {discountedPrice.toLocaleString('vi-VN')}đ
+                        <span className="text-xs text-gray-600 dark:text-gray-400 font-normal">
+                          /{product.unit}
+                        </span>
                       </p>
                       {product.discountEndTime && (
                         <CountdownTimer endTime={product.discountEndTime} />
                       )}
                     </>
                   ) : (
-                    <p className="text-sm text-red-600 dark:text-red-500 font-bold">
-                      {product.price.toLocaleString('vi-VN')}đ / {product.unit}
-                    </p>
+                    <>
+                      <p className="text-sm font-bold text-red-600 dark:text-red-500">
+                        {product.price.toLocaleString('vi-VN')}đ
+                        <span className="text-xs text-gray-600 dark:text-gray-400 font-normal">
+                          /{product.unit}
+                        </span>
+                      </p>
+                    </>
                   )}
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  className="w-full hover:bg-primary/90"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(product);
-                  }}
-                >
-                  Thêm vào giỏ
-                </Button>
-              </CardFooter>
+
+                {/* Add to Cart Button */}
+                <div className="px-3 pb-3 pt-1 bg-gray-50 dark:bg-gray-900">
+                  <Button
+                    className="w-full h-9 text-sm hover:bg-primary/90"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(product);
+                    }}
+                  >
+                    Thêm vào giỏ
+                  </Button>
+                </div>
+              </div>
             </Card>
           );
         })}
