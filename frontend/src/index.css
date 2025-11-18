@@ -119,3 +119,15 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 input[type='datetime-local']::before {
   color: white;
 }
+
+/* Date input calendar icon - white/lighter */
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.9);
+  cursor: pointer;
+}
+
+/* Time input clock icon - white/lighter */
+input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.9);
+  cursor: pointer;
+}

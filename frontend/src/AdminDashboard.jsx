@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SimpleLayout from './layouts/SimpleLayout.jsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ToastContainer } from './Toast.jsx';
 import {
   AlertCircle,
   Loader2,
@@ -24,7 +25,7 @@ export default function AdminDashboard() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(null);
+  const [toasts, setToasts] = useState([]);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchFeatured, setSearchFeatured] = useState('');
@@ -42,13 +43,23 @@ export default function AdminDashboard() {
 
   const authHeader = { headers: { Authorization: `Bearer ${token}` } };
 
+  // Toast helper function
+  const showToast = (type, message) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, type, message }]);
+  };
+
+  const removeToast = (id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
       const res = await axios.get(`${BACKEND_URL}/api/orders/all`, authHeader);
       setOrders(res.data.orders || []);
     } catch {
-      setStatus({ type: 'error', text: 'Lỗi khi tải đơn hàng' });
+      showToast('error', 'Lỗi khi tải đơn hàng');
     } finally {
       setLoading(false);
     }
@@ -137,14 +148,14 @@ export default function AdminDashboard() {
         authHeader,
       );
       if (res.data.success) {
-        setStatus({ type: 'success', text: 'Cập nhật trạng thái thành công' });
+        showToast('success', 'Cập nhật trạng thái thành công');
         fetchOrders();
       }
     } catch (err) {
-      setStatus({
-        type: 'error',
-        text: err.response?.data?.error || 'Lỗi cập nhật trạng thái',
-      });
+      showToast(
+        'error',
+        err.response?.data?.error || 'Lỗi cập nhật trạng thái',
+      );
     }
   };
 
@@ -158,15 +169,12 @@ export default function AdminDashboard() {
         authHeader,
       );
       if (res.data.success) {
-        setStatus({ type: 'success', text: 'Thêm danh mục thành công' });
+        showToast('success', 'Thêm danh mục thành công');
         setNewCategory('');
         fetchCategories();
       }
     } catch (err) {
-      setStatus({
-        type: 'error',
-        text: err.response?.data?.error || 'Lỗi thêm danh mục',
-      });
+      showToast('error', err.response?.data?.error || 'Lỗi thêm danh mục');
     }
   };
 
@@ -178,20 +186,17 @@ export default function AdminDashboard() {
         authHeader,
       );
       if (res.data.success) {
-        setStatus({ type: 'success', text: 'Xóa danh mục thành công' });
+        showToast('success', 'Xóa danh mục thành công');
         fetchCategories();
       }
     } catch (err) {
-      setStatus({
-        type: 'error',
-        text: err.response?.data?.error || 'Lỗi xóa danh mục',
-      });
+      showToast('error', err.response?.data?.error || 'Lỗi xóa danh mục');
     }
   };
 
   const handleUpdateCategory = async (categoryId, newName) => {
     if (!newName.trim()) {
-      setStatus({ type: 'error', text: 'Tên danh mục không được để trống' });
+      showToast('error', 'Tên danh mục không được để trống');
       return;
     }
     try {
@@ -201,15 +206,12 @@ export default function AdminDashboard() {
         authHeader,
       );
       if (res.data.success) {
-        setStatus({ type: 'success', text: 'Cập nhật danh mục thành công' });
+        showToast('success', 'Cập nhật danh mục thành công');
         setEditingCategory(null);
         fetchCategories();
       }
     } catch (err) {
-      setStatus({
-        type: 'error',
-        text: err.response?.data?.error || 'Lỗi cập nhật danh mục',
-      });
+      showToast('error', err.response?.data?.error || 'Lỗi cập nhật danh mục');
     }
   };
 
@@ -221,7 +223,7 @@ export default function AdminDashboard() {
       !newProduct.unit.trim() ||
       !newProduct.category
     ) {
-      setStatus({ type: 'error', text: 'Vui lòng điền đầy đủ thông tin' });
+      showToast('error', 'Vui lòng điền đầy đủ thông tin');
       return;
     }
 
@@ -237,7 +239,7 @@ export default function AdminDashboard() {
         authHeader,
       );
       if (res.data.success) {
-        setStatus({ type: 'success', text: 'Thêm sản phẩm thành công' });
+        showToast('success', 'Thêm sản phẩm thành công');
         setNewProduct({
           name: '',
           price: '',
@@ -247,10 +249,7 @@ export default function AdminDashboard() {
         fetchProducts();
       }
     } catch (err) {
-      setStatus({
-        type: 'error',
-        text: err.response?.data?.error || 'Lỗi thêm sản phẩm',
-      });
+      showToast('error', err.response?.data?.error || 'Lỗi thêm sản phẩm');
     }
   };
 
@@ -260,7 +259,7 @@ export default function AdminDashboard() {
       !editingProduct.price ||
       !editingProduct.unit.trim()
     ) {
-      setStatus({ type: 'error', text: 'Vui lòng điền đầy đủ thông tin' });
+      showToast('error', 'Vui lòng điền đầy đủ thông tin');
       return;
     }
 
@@ -276,15 +275,12 @@ export default function AdminDashboard() {
         authHeader,
       );
       if (res.data.success) {
-        setStatus({ type: 'success', text: 'Cập nhật sản phẩm thành công' });
+        showToast('success', 'Cập nhật sản phẩm thành công');
         setEditingProduct(null);
         fetchProducts();
       }
     } catch (err) {
-      setStatus({
-        type: 'error',
-        text: err.response?.data?.error || 'Lỗi cập nhật sản phẩm',
-      });
+      showToast('error', err.response?.data?.error || 'Lỗi cập nhật sản phẩm');
     }
   };
 
@@ -296,14 +292,11 @@ export default function AdminDashboard() {
         authHeader,
       );
       if (res.data.success) {
-        setStatus({ type: 'success', text: 'Xóa sản phẩm thành công' });
+        showToast('success', 'Xóa sản phẩm thành công');
         fetchProducts();
       }
     } catch (err) {
-      setStatus({
-        type: 'error',
-        text: err.response?.data?.error || 'Lỗi xóa sản phẩm',
-      });
+      showToast('error', err.response?.data?.error || 'Lỗi xóa sản phẩm');
     }
   };
 
@@ -346,17 +339,7 @@ export default function AdminDashboard() {
             </Button>
           </div>
 
-          {status && (
-            <div
-              className={`p-3 rounded mb-4 ${
-                status.type === 'error'
-                  ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
-                  : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-              }`}
-            >
-              {status.text}
-            </div>
-          )}
+          <ToastContainer toasts={toasts} onClose={removeToast} />
 
           <Tabs defaultValue="orders" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
@@ -883,16 +866,9 @@ export default function AdminDashboard() {
                                     : p,
                                 ),
                               );
-                              setStatus({
-                                type: 'success',
-                                text: 'Đã xóa khỏi khuyến mãi',
-                              });
-                              setTimeout(() => setStatus(null), 2000);
+                              showToast('success', 'Đã xóa khỏi khuyến mãi');
                             } catch {
-                              setStatus({
-                                type: 'error',
-                                text: 'Lỗi khi cập nhật',
-                              });
+                              showToast('error', 'Lỗi khi cập nhật');
                             }
                           }}
                         >
@@ -927,71 +903,79 @@ export default function AdminDashboard() {
                             className="w-full p-2 border rounded text-sm bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
                           />
                         </div>
-                        <div>
+                        <div className="space-y-2">
                           <label className="text-xs font-medium mb-1 block">
                             Thời gian kết thúc
                           </label>
-                          <input
-                            type="text"
-                            placeholder="dd/mm/yyyy HH:mm"
-                            value={
-                              prod.discountEndTime
-                                ? (() => {
-                                    const date = new Date(prod.discountEndTime);
-                                    const dd = String(date.getDate()).padStart(
-                                      2,
-                                      '0',
-                                    );
-                                    const mm = String(
-                                      date.getMonth() + 1,
-                                    ).padStart(2, '0');
-                                    const yyyy = date.getFullYear();
-                                    const hh = String(date.getHours()).padStart(
-                                      2,
-                                      '0',
-                                    );
-                                    const mins = String(
-                                      date.getMinutes(),
-                                    ).padStart(2, '0');
-                                    return `${dd}/${mm}/${yyyy} ${hh}:${mins}`;
-                                  })()
-                                : ''
-                            }
-                            onChange={(e) => {
-                              const input = e.target.value;
-                              let dateObj = null;
+                          <div className="flex gap-2">
+                            <input
+                              type="date"
+                              value={
+                                prod.discountEndTime
+                                  ? new Date(prod.discountEndTime)
+                                      .toISOString()
+                                      .split('T')[0]
+                                  : ''
+                              }
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  const date = new Date(e.target.value);
+                                  const currentTime = prod.discountEndTime
+                                    ? new Date(prod.discountEndTime)
+                                    : new Date();
+                                  date.setHours(currentTime.getHours());
+                                  date.setMinutes(currentTime.getMinutes());
 
-                              if (input) {
-                                const [datePart, timePart] = input.split(' ');
-                                const [dd, mm, yyyy] = datePart.split('/');
-                                const [hh, mins] = (timePart || '00:00').split(
-                                  ':',
-                                );
-
-                                if (dd && mm && yyyy) {
-                                  dateObj = new Date(
-                                    parseInt(yyyy),
-                                    parseInt(mm) - 1,
-                                    parseInt(dd),
-                                    parseInt(hh) || 0,
-                                    parseInt(mins) || 0,
+                                  setProducts(
+                                    products.map((p) =>
+                                      p._id === prod._id
+                                        ? { ...p, discountEndTime: date }
+                                        : p,
+                                    ),
                                   );
                                 }
+                              }}
+                              className="flex-1 p-2 border rounded text-sm bg-gray-800 border-gray-600 text-white"
+                            />
+                            <input
+                              type="time"
+                              value={
+                                prod.discountEndTime
+                                  ? (() => {
+                                      const date = new Date(
+                                        prod.discountEndTime,
+                                      );
+                                      const hh = String(
+                                        date.getHours(),
+                                      ).padStart(2, '0');
+                                      const mm = String(
+                                        date.getMinutes(),
+                                      ).padStart(2, '0');
+                                      return `${hh}:${mm}`;
+                                    })()
+                                  : ''
                               }
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  const [hh, mm] = e.target.value.split(':');
+                                  const currentDate = prod.discountEndTime
+                                    ? new Date(prod.discountEndTime)
+                                    : new Date();
+                                  currentDate.setHours(parseInt(hh));
+                                  currentDate.setMinutes(parseInt(mm));
 
-                              setProducts(
-                                products.map((p) =>
-                                  p._id === prod._id
-                                    ? {
-                                        ...p,
-                                        discountEndTime: dateObj,
-                                      }
-                                    : p,
-                                ),
-                              );
-                            }}
-                            className="w-full p-2 border rounded text-sm bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
-                          />
+                                  setProducts(
+                                    products.map((p) =>
+                                      p._id === prod._id
+                                        ? { ...p, discountEndTime: currentDate }
+                                        : p,
+                                    ),
+                                  );
+                                }
+                              }}
+                              className="flex-1 p-2 border rounded text-sm bg-gray-800 border-gray-600 text-white"
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -1012,16 +996,9 @@ export default function AdminDashboard() {
                               },
                               authHeader,
                             );
-                            setStatus({
-                              type: 'success',
-                              text: 'Đã cập nhật giảm giá',
-                            });
-                            setTimeout(() => setStatus(null), 2000);
+                            showToast('success', 'Đã cập nhật giảm giá');
                           } catch {
-                            setStatus({
-                              type: 'error',
-                              text: 'Lỗi khi cập nhật',
-                            });
+                            showToast('error', 'Lỗi khi cập nhật');
                           }
                         }}
                       >
@@ -1089,16 +1066,9 @@ export default function AdminDashboard() {
                                     : p,
                                 ),
                               );
-                              setStatus({
-                                type: 'success',
-                                text: 'Đã thêm vào khuyến mãi',
-                              });
-                              setTimeout(() => setStatus(null), 2000);
+                              showToast('success', 'Đã thêm vào khuyến mãi');
                             } catch {
-                              setStatus({
-                                type: 'error',
-                                text: 'Lỗi khi cập nhật',
-                              });
+                              showToast('error', 'Lỗi khi cập nhật');
                             }
                           }}
                         >
