@@ -1,5 +1,8 @@
 /* src/index.css */
 @import 'tailwindcss';
+@import './styles/enhanced-animations.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   /* Light mode colors - Màu tím nhạt */
