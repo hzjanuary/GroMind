@@ -1,8 +1,8 @@
 // src/Header.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useCart } from './CartContext.jsx';
-import { useAuth } from './AuthContext.jsx'; // <- THÊM MỚI
-import LoginDialog from './LoginDialog.jsx'; // <- THÊM MỚI
+import { useAuth } from './AuthContext.jsx';
+import LoginDialog from './LoginDialog.jsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {

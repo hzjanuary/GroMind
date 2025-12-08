@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import EnhancedHeader from './components/Header';
-import Footer from './Footer';
+import SimpleLayout from './layouts/SimpleLayout';
 import { useAuth } from './AuthContext';
 import { useCart } from './CartContext';
 import { toast } from './lib/toast';
@@ -14,6 +13,7 @@ import {
   Star,
   Truck,
   Loader2,
+  ArrowLeft,
 } from 'lucide-react';
 
 const Favorites = () => {
@@ -77,35 +77,49 @@ const Favorites = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-950">
-        <EnhancedHeader />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-            Sản phẩm yêu thích
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Vui lòng đăng nhập để xem danh sách sản phẩm yêu thích của bạn.
-          </p>
-          <Button onClick={() => navigate('/')}>Về trang chủ</Button>
+      <SimpleLayout>
+        <div className="container mx-auto px-4 py-8">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/')}
+            className="mb-6"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Quay về trang chủ
+          </Button>
+          <div className="text-center py-16">
+            <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              Sản phẩm yêu thích
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Vui lòng đăng nhập để xem danh sách sản phẩm yêu thích của bạn.
+            </p>
+            <Button onClick={() => navigate('/')}>Về trang chủ</Button>
+          </div>
         </div>
-        <Footer />
-      </div>
+      </SimpleLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      <EnhancedHeader />
+    <SimpleLayout>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Heart className="h-6 w-6 text-red-500 fill-red-500" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Sản phẩm yêu thích
-          </h1>
-          <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium">
-            {favorites.length} sản phẩm
-          </span>
+        {/* Header with back button */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Heart className="h-6 w-6 text-red-500 fill-red-500" />
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Sản phẩm yêu thích
+            </h1>
+            <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium">
+              {favorites.length} sản phẩm
+            </span>
+          </div>
+          <Button variant="outline" onClick={() => navigate('/')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Quay về trang chủ
+          </Button>
         </div>
 
         {isLoading ? (
@@ -298,8 +312,7 @@ const Favorites = () => {
           </div>
         )}
       </div>
-      <Footer />
-    </div>
+    </SimpleLayout>
   );
 };
 
