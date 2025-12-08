@@ -35,7 +35,7 @@ const Favorites = () => {
       }
     };
     fetchFavorites();
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, loadFavorites]);
 
   const handleRemoveFavorite = async (productId) => {
     setRemovingId(productId);
@@ -68,8 +68,8 @@ const Favorites = () => {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/\s+/g, '-')
-      .replace(/[^\w\-]+/g, '')
-      .replace(/\-\-+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-')
       .replace(/^-+/, '')
       .replace(/-+$/, '');
     navigate(`/${slug}`);
