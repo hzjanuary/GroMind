@@ -48,6 +48,23 @@ const userSchema = new mongoose.Schema(
         label: String,
       },
     ],
+    favorites: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Product',
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

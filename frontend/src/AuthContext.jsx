@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [favorites, setFavorites] = useState([]);
 
   // Load token và user từ localStorage khi app khởi động
   useEffect(() => {
@@ -27,6 +28,8 @@ export function AuthProvider({ children }) {
           if (response.data.success) {
             setUser(response.data.user);
             setToken(savedToken);
+            // Load favorites after user is authenticated
+            await loadFavorites(savedToken);
           } else {
             // Token không hợp lệ, xóa đi
             localStorage.removeItem('token');
@@ -42,6 +45,62 @@ export function AuthProvider({ children }) {
 
     loadUser();
   }, []);
+
+  // Load favorites từ backend
+  const loadFavorites = async (authToken) => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/favorites`, {
+        headers: {
+          Authorization: `Bearer ${authToken || token}`,
+        },
+      });
+      if (response.data.success) {
+        setFavorites(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  };
+
+  // Toggle favorite (thêm/xóa sản phẩm khỏi danh sách yêu thích)
+  const toggleFavorite = async (productId) => {
+    if (!token) return { success: false, error: 'Vui lòng đăng nhập' };
+
+    try {
+      const response = await axios.put(
+        `${BACKEND_URL}/api/favorites/${productId}/toggle`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setFavorites(response.data.data);
+        return {
+          success: true,
+          isFavorited: response.data.isFavorited,
+          message: response.data.message,
+        };
+      }
+      return { success: false, error: 'Không thể cập nhật yêu thích' };
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Lỗi khi cập nhật yêu thích',
+      };
+    }
+  };
+
+  // Kiểm tra sản phẩm có trong favorites không
+  const isFavorited = (productId) => {
+    return favorites.some(
+      (fav) => fav.productId?.toString() === productId?.toString(),
+    );
+  };
 
   // Hàm đăng nhập (email hoặc username)
   const login = async (emailOrUsername, password) => {
@@ -61,6 +120,9 @@ export function AuthProvider({ children }) {
         // Lưu token vào localStorage
         localStorage.setItem('token', token);
 
+        // Load favorites after login
+        await loadFavorites(token);
+
         return { success: true };
       }
     } catch (error) {
@@ -73,6 +135,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setFavorites([]);
     localStorage.removeItem('token');
   };
 
@@ -125,10 +188,14 @@ export function AuthProvider({ children }) {
     token,
     isLoading,
     isAuthenticated: !!user,
+    favorites,
     login,
     logout,
     register,
     refreshUser,
+    toggleFavorite,
+    isFavorited,
+    loadFavorites,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

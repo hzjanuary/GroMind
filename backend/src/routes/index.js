@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const productRoutes = require('./productRoutes');
 const categoryRoutes = require('./categoryRoutes');
+const favoriteRoutes = require('./favoriteRoutes');
 const {
   suggestRecipe,
   getRecipeDetails,
@@ -11,6 +12,7 @@ const orderRoutes = require('./orderRoutes');
 // Phân luồng các route
 router.use('/products', productRoutes); // Mọi request đến /api/products sẽ do productRoutes xử lý
 router.use('/categories', categoryRoutes);
+router.use('/favorites', favoriteRoutes);
 router.use('/orders', orderRoutes);
 
 // API Gợi ý (đã có)

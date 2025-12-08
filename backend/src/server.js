@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const connectDB = require('./config/db'); // Import hàm kết nối DB
 const allRoutes = require('./routes'); // Import file route "tổng"
-const authRoutes = require('./routes/authRoutes'); // <- CHỈ IMPORT 1 LẦN
+const authRoutes = require('./routes/authRoutes');
 
 // Khởi chạy kết nối CSDL
 connectDB();

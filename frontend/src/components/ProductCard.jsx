@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../CartContext.jsx';
+import { useAuth } from '../AuthContext.jsx';
 import { toast } from '../lib/toast.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,9 +18,13 @@ import {
 function ProductCard({ product }) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isAuthenticated, isFavorited, toggleFavorite } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+
+  // Kiểm tra trạng thái yêu thích từ context
+  const productIsFavorited = isFavorited(product._id);
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -27,9 +32,29 @@ function ProductCard({ product }) {
     toast.success(`Đã thêm ${product.name} vào giỏ hàng`);
   };
 
-  const handleFavorite = (e) => {
+  const handleFavorite = async (e) => {
     e.stopPropagation();
-    setIsFavorited(!isFavorited);
+
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để thêm vào yêu thích');
+      return;
+    }
+
+    if (isTogglingFavorite) return;
+
+    setIsTogglingFavorite(true);
+    try {
+      const result = await toggleFavorite(product._id);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra');
+    } finally {
+      setIsTogglingFavorite(false);
+    }
   };
 
   const discountedPrice =
@@ -70,11 +95,14 @@ function ProductCard({ product }) {
         {/* Favorite Button */}
         <button
           onClick={handleFavorite}
-          className="absolute top-3 right-3 z-20 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md transition-all duration-200 hover:scale-110 hover:bg-white"
+          disabled={isTogglingFavorite}
+          className={`absolute top-3 right-3 z-20 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md transition-all duration-200 hover:scale-110 hover:bg-white ${
+            isTogglingFavorite ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           <Heart
             className={`h-4 w-4 transition-colors ${
-              isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600'
+              productIsFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600'
             }`}
           />
         </button>
