@@ -14,17 +14,29 @@ import {
   X,
   Phone,
   MapPin,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 
 function MobileNavigation({ cartItems, isAuthenticated, user }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const menuItems = [
-    { icon: <Home className="h-5 w-5" />, label: "Trang chủ", href: "/" },
-    { icon: <Search className="h-5 w-5" />, label: "Tìm kiếm", href: "/search" },
-    { icon: <Heart className="h-5 w-5" />, label: "Yêu thích", href: "/favorites" },
-    { icon: <ShoppingBag className="h-5 w-5" />, label: "Đơn hàng", href: "/orders" },
+    { icon: <Home className="h-5 w-5" />, label: 'Trang chủ', href: '/' },
+    {
+      icon: <Search className="h-5 w-5" />,
+      label: 'Tìm kiếm',
+      href: '/search',
+    },
+    {
+      icon: <Heart className="h-5 w-5" />,
+      label: 'Yêu thích',
+      href: '/favorites',
+    },
+    {
+      icon: <ShoppingBag className="h-5 w-5" />,
+      label: 'Đơn hàng',
+      href: '/orders',
+    },
   ];
 
   return (
@@ -34,7 +46,7 @@ function MobileNavigation({ cartItems, isAuthenticated, user }) {
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      
+
       <SheetContent side="left" className="w-80 p-0">
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -87,16 +99,28 @@ function MobileNavigation({ cartItems, isAuthenticated, user }) {
             <div className="p-4 border-t">
               <h3 className="font-semibold mb-3">Danh mục</h3>
               <div className="space-y-2">
-                <a href="/categories/vegetables" className="block p-2 hover:bg-gray-100 rounded">
+                <a
+                  href="/categories/vegetables"
+                  className="block p-2 hover:bg-gray-100 rounded"
+                >
                   🥬 Rau củ
                 </a>
-                <a href="/categories/fruits" className="block p-2 hover:bg-gray-100 rounded">
+                <a
+                  href="/categories/fruits"
+                  className="block p-2 hover:bg-gray-100 rounded"
+                >
                   🍎 Trái cây
                 </a>
-                <a href="/categories/meat" className="block p-2 hover:bg-gray-100 rounded">
+                <a
+                  href="/categories/meat"
+                  className="block p-2 hover:bg-gray-100 rounded"
+                >
                   🥩 Thịt cá
                 </a>
-                <a href="/categories/dry" className="block p-2 hover:bg-gray-100 rounded">
+                <a
+                  href="/categories/dry"
+                  className="block p-2 hover:bg-gray-100 rounded"
+                >
                   🌾 Đồ khô
                 </a>
               </div>
@@ -127,21 +151,27 @@ function MobileProductGrid({ products }) {
   return (
     <div className="grid grid-cols-2 gap-3 px-4">
       {products.map((product) => (
-        <div key={product._id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div
+          key={product._id}
+          className="bg-white rounded-lg shadow-sm overflow-hidden"
+        >
           {/* Product Image */}
           <div className="relative aspect-square">
             <img
-              src={product.image || `https://picsum.photos/seed/${product._id}/200/200.jpg`}
+              src={
+                product.image ||
+                `https://picsum.photos/seed/${product._id}/200/200.jpg`
+              }
               alt={product.name}
               className="w-full h-full object-cover"
             />
-            {product.discountPercent > 0 && (
+            {product.isFeatured && product.discountPercent > 0 && (
               <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                 -{product.discountPercent}%
               </span>
             )}
           </div>
-          
+
           {/* Product Info */}
           <div className="p-3">
             <h3 className="font-medium text-sm mb-1 line-clamp-2">
@@ -149,10 +179,13 @@ function MobileProductGrid({ products }) {
             </h3>
             <div className="flex items-center justify-between">
               <div>
-                {product.discountPercent > 0 ? (
+                {product.isFeatured && product.discountPercent > 0 ? (
                   <>
                     <p className="text-sm font-bold text-red-600">
-                      {Math.round(product.price * (1 - product.discountPercent / 100)).toLocaleString('vi-VN')}đ
+                      {Math.round(
+                        product.price * (1 - product.discountPercent / 100),
+                      ).toLocaleString('vi-VN')}
+                      đ
                     </p>
                     <p className="text-xs text-gray-400 line-through">
                       {product.price.toLocaleString('vi-VN')}đ
@@ -185,9 +218,11 @@ function MobileSearch({ onSearch, allProducts }) {
   const [showResults, setShowResults] = useState(false);
 
   const filteredProducts = searchTerm
-    ? allProducts.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ).slice(0, 5)
+    ? allProducts
+        .filter((product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        )
+        .slice(0, 5)
     : [];
 
   return (
@@ -288,7 +323,7 @@ export const useResponsive = () => {
 export const touchableSizes = {
   small: 'p-3 min-h-[44px]',
   medium: 'p-4 min-h-[48px]',
-  large: 'p-6 min-h-[52px]'
+  large: 'p-6 min-h-[52px]',
 };
 
 // Mobile-optimized spacing
@@ -296,12 +331,7 @@ export const mobileSpacing = {
   container: 'px-4',
   section: 'py-6',
   card: 'p-4',
-  button: 'py-3 px-6'
+  button: 'py-3 px-6',
 };
 
-export {
-  MobileNavigation,
-  MobileProductGrid,
-  MobileSearch,
-  MobileCart
-};
+export { MobileNavigation, MobileProductGrid, MobileSearch, MobileCart };

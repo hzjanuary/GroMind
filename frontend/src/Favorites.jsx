@@ -25,16 +25,24 @@ const Favorites = () => {
   const [removingId, setRemovingId] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchFavorites = async () => {
       if (isAuthenticated && token) {
         setIsLoading(true);
         await loadFavorites(token);
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       } else {
         setIsLoading(false);
       }
     };
     fetchFavorites();
+
+    return () => {
+      isMounted = false;
+    };
   }, [isAuthenticated, token, loadFavorites]);
 
   const handleRemoveFavorite = async (productId) => {
@@ -143,12 +151,14 @@ const Favorites = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {favorites.map((favorite) => {
               const product = favorite.product;
-              const discountedPrice =
-                product && product.discountPercent > 0
-                  ? Math.round(
-                      product.price * (1 - product.discountPercent / 100),
-                    )
-                  : product?.price;
+              // Chỉ hiển thị giá khuyến mãi khi sản phẩm là featured
+              const hasDiscount =
+                product?.isFeatured && product?.discountPercent > 0;
+              const discountedPrice = hasDiscount
+                ? Math.round(
+                    product.price * (1 - product.discountPercent / 100),
+                  )
+                : product?.price;
 
               return (
                 <Card
@@ -160,7 +170,7 @@ const Favorites = () => {
                     className="relative overflow-hidden bg-gray-100 aspect-square cursor-pointer"
                     onClick={() => navigateToProduct(product)}
                   >
-                    {product?.discountPercent > 0 && (
+                    {hasDiscount && (
                       <div className="absolute top-3 left-3 z-20">
                         <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                           -{product.discountPercent}%
@@ -226,7 +236,7 @@ const Favorites = () => {
 
                         {/* Price */}
                         <div className="mb-3">
-                          {product.discountPercent > 0 ? (
+                          {hasDiscount ? (
                             <>
                               <p className="text-lg font-bold text-red-600">
                                 {discountedPrice?.toLocaleString('vi-VN')}đ

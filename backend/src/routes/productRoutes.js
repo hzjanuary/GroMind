@@ -8,6 +8,72 @@ const User = require('../models/userModel');
 // GET /api/products
 router.get('/', getAllProducts);
 
+// GET /api/products/featured - lấy danh sách sản phẩm khuyến mãi (đặt trước /:id)
+router.get('/featured', async (req, res) => {
+  try {
+    const featuredProducts = await Product.find({ isFeatured: true });
+
+    if (featuredProducts.length === 0) {
+      return res.json({
+        success: true,
+        products: [],
+        message: 'Chưa có sản phẩm khuyến mãi',
+      });
+    }
+
+    res.json({
+      success: true,
+      products: featuredProducts,
+      count: featuredProducts.length,
+    });
+  } catch (err) {
+    console.error('Error fetching featured products:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
+  }
+});
+
+// DELETE /api/products/featured/clear-all - xóa hết khuyến mãi (admin only, đặt trước /:id)
+router.delete('/featured/clear-all', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).lean();
+    if (!user || user.username !== 'admin') {
+      return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
+
+    // Tìm tất cả sản phẩm có isFeatured = true
+    const featuredProducts = await Product.find({ isFeatured: true });
+
+    if (featuredProducts.length === 0) {
+      return res.json({
+        success: true,
+        message: 'Không có sản phẩm khuyến mãi nào để xóa',
+        count: 0,
+      });
+    }
+
+    // Cập nhật tất cả sản phẩm: bỏ featured, reset discount
+    const result = await Product.updateMany(
+      { isFeatured: true },
+      {
+        $set: {
+          isFeatured: false,
+          discountPercent: 0,
+          discountEndTime: null,
+        },
+      },
+    );
+
+    res.json({
+      success: true,
+      message: `Đã xóa ${result.modifiedCount} sản phẩm khỏi khuyến mãi`,
+      count: result.modifiedCount,
+    });
+  } catch (err) {
+    console.error('Error clearing all featured products:', err);
+    res.status(500).json({ success: false, error: 'Lỗi server' });
+  }
+});
+
 // POST /api/products - create product (admin only)
 router.post('/', verifyToken, async (req, res) => {
   try {

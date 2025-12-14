@@ -75,13 +75,16 @@ function ProductList({ products, showLoadMore = false, onLoadMore }) {
   };
 
   const getDiscountedPrice = (product) => {
-    if (product.discountPercent > 0) {
+    // Chỉ tính giá khuyến mãi khi sản phẩm là featured và có discount
+    if (product.isFeatured && product.discountPercent > 0) {
       return Math.round(product.price * (1 - product.discountPercent / 100));
     }
     return product.price;
   };
 
   const isDiscountActive = (product) => {
+    // Chỉ hiển thị khuyến mãi khi sản phẩm là featured
+    if (!product.isFeatured) return false;
     if (!product.discountEndTime) return product.discountPercent > 0;
     return (
       new Date(product.discountEndTime) > new Date() &&

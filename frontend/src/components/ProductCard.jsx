@@ -57,10 +57,11 @@ function ProductCard({ product }) {
     }
   };
 
-  const discountedPrice =
-    product.discountPercent > 0
-      ? Math.round(product.price * (1 - product.discountPercent / 100))
-      : product.price;
+  // Chỉ hiển thị giá khuyến mãi khi sản phẩm là featured VÀ có discount
+  const hasDiscount = product.isFeatured && product.discountPercent > 0;
+  const discountedPrice = hasDiscount
+    ? Math.round(product.price * (1 - product.discountPercent / 100))
+    : product.price;
 
   return (
     <Card
@@ -83,8 +84,8 @@ function ProductCard({ product }) {
     >
       {/* Product Image Section */}
       <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 aspect-square">
-        {/* Discount Badge */}
-        {product.discountPercent > 0 && (
+        {/* Discount Badge - chỉ hiển thị khi isFeatured và có discount */}
+        {hasDiscount && (
           <div className="absolute top-3 left-3 z-20">
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
               -{product.discountPercent}%
@@ -196,7 +197,7 @@ function ProductCard({ product }) {
         {/* Price Section */}
         <div className="flex items-end justify-between mb-3">
           <div>
-            {product.discountPercent > 0 ? (
+            {hasDiscount ? (
               <>
                 <p className="text-lg font-bold text-red-600">
                   {discountedPrice.toLocaleString('vi-VN')}đ

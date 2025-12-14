@@ -300,6 +300,37 @@ export default function AdminDashboard() {
     }
   };
 
+  // Xóa hết khuyến mãi - sử dụng API backend
+  const handleClearAllFeatured = async () => {
+    const featuredProducts = products.filter((p) => p.isFeatured);
+    if (featuredProducts.length === 0) {
+      showToast('error', 'Không có sản phẩm khuyến mãi nào');
+      return;
+    }
+    if (
+      !confirm(
+        `Xác nhận xóa tất cả ${featuredProducts.length} sản phẩm khỏi khuyến mãi?`,
+      )
+    )
+      return;
+
+    try {
+      setLoading(true);
+      const res = await axios.delete(
+        `${BACKEND_URL}/api/products/featured/clear-all`,
+        authHeader,
+      );
+      if (res.data.success) {
+        showToast('success', res.data.message);
+        fetchProducts();
+      }
+    } catch (err) {
+      showToast('error', err.response?.data?.error || 'Lỗi khi xóa khuyến mãi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'ordered':
@@ -792,9 +823,21 @@ export default function AdminDashboard() {
 
             {/* Featured Products Tab */}
             <TabsContent value="featured" className="space-y-4">
-              <h2 className="text-xl font-semibold mb-4">
-                Quản lý Sản phẩm Khuyến mãi
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">
+                  Quản lý Sản phẩm Khuyến mãi
+                </h2>
+                <Button
+                  variant="outline"
+                  onClick={handleClearAllFeatured}
+                  disabled={
+                    loading || products.filter((p) => p.isFeatured).length === 0
+                  }
+                  className="text-red-400 border-red-400 hover:bg-red-400/10"
+                >
+                  Xóa hết khuyến mãi
+                </Button>
+              </div>
               <p className="text-sm text-gray-300 mb-4">
                 Thêm sản phẩm khuyến mãi không giới hạn. Chỉ 4 sản phẩm đầu tiên
                 hiển thị trên trang chủ.

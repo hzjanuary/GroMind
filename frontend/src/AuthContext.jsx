@@ -1,5 +1,11 @@
 // src/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -47,20 +53,23 @@ export function AuthProvider({ children }) {
   }, []);
 
   // Load favorites từ backend
-  const loadFavorites = async (authToken) => {
-    try {
-      const response = await axios.get(`${BACKEND_URL}/api/favorites`, {
-        headers: {
-          Authorization: `Bearer ${authToken || token}`,
-        },
-      });
-      if (response.data.success) {
-        setFavorites(response.data.data);
+  const loadFavorites = useCallback(
+    async (authToken) => {
+      try {
+        const response = await axios.get(`${BACKEND_URL}/api/favorites`, {
+          headers: {
+            Authorization: `Bearer ${authToken || token}`,
+          },
+        });
+        if (response.data.success) {
+          setFavorites(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error loading favorites:', error);
       }
-    } catch (error) {
-      console.error('Error loading favorites:', error);
-    }
-  };
+    },
+    [token],
+  );
 
   // Toggle favorite (thêm/xóa sản phẩm khỏi danh sách yêu thích)
   const toggleFavorite = async (productId) => {
