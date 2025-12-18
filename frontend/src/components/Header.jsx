@@ -449,11 +449,11 @@ function Header({ onSearch, allProducts = [] }) {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <nav className="container mx-auto px-4 py-4 space-y-2">
             <Button
               variant="ghost"
-              className="w-full justify-start"
+              className="w-full justify-start text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               onClick={() => {
                 setIsSearchExpanded(!isSearchExpanded);
                 setIsMobileMenuOpen(false);
@@ -464,7 +464,7 @@ function Header({ onSearch, allProducts = [] }) {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start"
+              className="w-full justify-start text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               onClick={() => navigate('/categories')}
             >
               <Menu className="mr-2 h-4 w-4" />
@@ -472,7 +472,7 @@ function Header({ onSearch, allProducts = [] }) {
             </Button>
             <Button
               variant="ghost"
-              className="w-full justify-start"
+              className="w-full justify-start text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               onClick={() => navigate('/favorites')}
             >
               <Heart className="mr-2 h-4 w-4" />
@@ -481,7 +481,7 @@ function Header({ onSearch, allProducts = [] }) {
             {!isAuthenticated && (
               <Button
                 variant="ghost"
-                className="w-full justify-start"
+                className="w-full justify-start text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={() => setShowLoginDialog(true)}
               >
                 <LogIn className="mr-2 h-4 w-4" />

@@ -47,12 +47,14 @@ function MobileNavigation({ cartItems, isAuthenticated, user }) {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="left" className="w-80 p-0">
+      <SheetContent side="left" className="w-80 p-0 bg-white dark:bg-gray-900">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-4 border-b">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">GroMind</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                GroMind
+              </h2>
               <Button
                 variant="ghost"
                 size="icon"
@@ -65,27 +67,31 @@ function MobileNavigation({ cartItems, isAuthenticated, user }) {
 
           {/* User Info */}
           {isAuthenticated && (
-            <div className="p-4 bg-gray-50 border-b">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
                   {user?.name?.charAt(0) || 'U'}
                 </div>
                 <div>
-                  <p className="font-medium">{user?.name}</p>
-                  <p className="text-sm text-gray-500">{user?.phone}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {user?.name}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {user?.phone}
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Navigation Menu */}
-          <nav className="flex-1 overflow-y-auto">
+          <nav className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
             <div className="p-4 space-y-2">
               {menuItems.map((item, index) => (
                 <a
                   key={index}
                   href={item.href}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-900 dark:text-white"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.icon}
@@ -96,30 +102,32 @@ function MobileNavigation({ cartItems, isAuthenticated, user }) {
             </div>
 
             {/* Categories */}
-            <div className="p-4 border-t">
-              <h3 className="font-semibold mb-3">Danh mục</h3>
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">
+                Danh mục
+              </h3>
               <div className="space-y-2">
                 <a
                   href="/categories/vegetables"
-                  className="block p-2 hover:bg-gray-100 rounded"
+                  className="block p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300"
                 >
                   🥬 Rau củ
                 </a>
                 <a
                   href="/categories/fruits"
-                  className="block p-2 hover:bg-gray-100 rounded"
+                  className="block p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300"
                 >
                   🍎 Trái cây
                 </a>
                 <a
                   href="/categories/meat"
-                  className="block p-2 hover:bg-gray-100 rounded"
+                  className="block p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300"
                 >
                   🥩 Thịt cá
                 </a>
                 <a
                   href="/categories/dry"
-                  className="block p-2 hover:bg-gray-100 rounded"
+                  className="block p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded text-gray-700 dark:text-gray-300"
                 >
                   🌾 Đồ khô
                 </a>
@@ -128,13 +136,13 @@ function MobileNavigation({ cartItems, isAuthenticated, user }) {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t bg-gray-50">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Phone className="h-4 w-4" />
                 <span>1900-1234</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <MapPin className="h-4 w-4" />
                 <span>Giao hàng toàn quốc</span>
               </div>
@@ -234,7 +242,7 @@ function MobileSearch({ onSearch, allProducts }) {
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setShowResults(true)}
           placeholder="Tìm kiếm sản phẩm..."
-          className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+          className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
         />
         <button
           onClick={() => onSearch(searchTerm)}
@@ -246,7 +254,7 @@ function MobileSearch({ onSearch, allProducts }) {
 
       {/* Search Results */}
       {showResults && filteredProducts.length > 0 && (
-        <div className="absolute top-full left-4 right-4 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-4 right-4 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
           {filteredProducts.map((product) => (
             <button
               key={product._id}
@@ -255,7 +263,7 @@ function MobileSearch({ onSearch, allProducts }) {
                 setSearchTerm(product.name);
                 setShowResults(false);
               }}
-              className="w-full text-left p-3 hover:bg-gray-50 flex items-center gap-3 border-b last:border-b-0"
+              className="w-full text-left p-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-3 border-b dark:border-gray-700 last:border-b-0"
             >
               <img
                 src={`https://picsum.photos/seed/${product._id}/40/40.jpg`}
@@ -263,8 +271,10 @@ function MobileSearch({ onSearch, allProducts }) {
                 className="w-10 h-10 rounded object-cover"
               />
               <div className="flex-1">
-                <p className="text-sm font-medium">{product.name}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {product.name}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {product.price.toLocaleString('vi-VN')}đ
                 </p>
               </div>
@@ -279,11 +289,13 @@ function MobileSearch({ onSearch, allProducts }) {
 // Mobile Cart Component
 function MobileCart({ cartItems, totalAmount, onCheckout }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
+    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t dark:border-gray-700 shadow-lg z-40">
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="font-medium">Giỏ hàng ({cartItems.length})</span>
-          <span className="font-bold text-lg">
+          <span className="font-medium text-gray-900 dark:text-white">
+            Giỏ hàng ({cartItems.length})
+          </span>
+          <span className="font-bold text-lg text-gray-900 dark:text-white">
             {totalAmount.toLocaleString('vi-VN')}đ
           </span>
         </div>
